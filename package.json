@@ -1,0 +1,19 @@
+{
+  "name": "gui",
+  "version": "1.0.0",
+  "description": "GUI for capstone project",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NutonFlash/GUI"
+  },
+  "author": "Aleksei Kislitsin",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^27.0.0"
+  }
+}
