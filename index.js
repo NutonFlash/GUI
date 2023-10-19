@@ -1,9 +1,14 @@
-const user = { authorized: false };
+let user = {};
 
 window.onload = () => {
     hideAlert();
-
     enableLoginInput();
+
+    user = JSON.parse(
+        localStorage.getItem('user') || '{ "authorized": false }',
+    );
+
+    if (user.authorized) displayWorkers();
 };
 
 function enableLoginInput() {
@@ -27,6 +32,9 @@ function displayWorkers() {
 
 function handleEdit() {
     user.authorized = false;
+
+    localStorage.removeItem('user');
+
     enableLoginInput();
 }
 
@@ -57,6 +65,8 @@ function authorizeDriver() {
     if (userExists) {
         user.authorized = true;
         user.id = carId;
+
+        localStorage.setItem('user', JSON.stringify(user));
     }
 
     return userExists;
