@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 
 const createWindow = () => {
     const win = new BrowserWindow({
