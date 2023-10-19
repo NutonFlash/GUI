@@ -1,0 +1,88 @@
+#sidebar-container {
+    width: 30vw;
+    height: 100vh;
+
+    background-color: silver;
+
+    position: fixed;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+
+    flex-wrap: wrap;
+
+    transition: 0.1s width;
+}
+
+#sidebar-container:has(#chevron-container input:checked) {
+    width: 1vw;
+}
+
+#sidebar-chevron:has(#chevron-container input:checked) {
+    left: 1vw;
+}
+
+#chevron-container:has(input:checked) {
+    rotate: 180deg;
+}
+
+#sidebar-chevron {
+    width: 30px;
+    height: 100vh;
+
+    left: 30vw;
+    transform: translateX(-15px);
+
+    position: fixed;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.1s left;
+}
+
+#sidebar-chevron #chevron-container {
+    width: 15px;
+    height: 5rem;
+
+    background-color: gray;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 2px solid darkgray;
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    user-select: none;
+}
+
+#sidebar-chevron img {
+    width: 100%;
+}
+
+#map {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    z-index: 0;
+    background-color: silver;
+}
+
+.visually-hidden {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}

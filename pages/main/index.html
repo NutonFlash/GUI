@@ -12,9 +12,18 @@
 </head>
 
 <body style="overflow: hidden; margin: 0; padding: 0;">
-    <div id="map" style="width:100vw;height:100vh;position:absolute;z-index: 0;background-color:silver;">MAP_NOT_LOADED
+    <div id="map">MAP_NOT_LOADED
     </div>
-    <button id="backBtn" style="position:absolute; z-index: 1;right: 0;">BACK</button>
+    <div id="sidebar-container">
+        <div id="sidebar-chevron">
+            <label id="chevron-container" for="sidebar-toggle">
+                <img src="../../src/UI/chevron-left-black.svg"><input type="checkbox" id="sidebar-toggle"
+                    class="visually-hidden">
+            </label>
+        </div>
+        <h1>Sidebar</h1><button id="backBtn" style="position:absolute; z-index: 1;right: 0;">BACK</button>
+    </div>
+
 </body>
 
 </html>
