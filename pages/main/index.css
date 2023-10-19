@@ -1,12 +1,13 @@
 #sidebar-container {
-    width: 30vw;
+    width: 350px;
+
     height: 100vh;
 
-    background-color: silver;
+    background-color: rgb(167, 167, 167);
 
     position: fixed;
 
-    overflow-x: hidden;
+    overflow-x: auto;
     overflow-y: auto;
 
     display: flex;
@@ -14,18 +15,18 @@
 
     flex-wrap: wrap;
 
-    transition: 0.1s width;
+    transition: 0.1s transform;
 }
 
-#sidebar-container:has(#chevron-container input:checked) {
-    width: 1vw;
+#sidebar-chevron:has(#chevron-container input:checked) + #sidebar-container {
+    transform: translateX(-335px);
 }
 
 #sidebar-chevron:has(#chevron-container input:checked) {
-    left: 1vw;
+    transform: translateX(0px);
 }
 
-#chevron-container:has(input:checked) {
+#chevron-container:has(input:checked) img {
     rotate: 180deg;
 }
 
@@ -33,8 +34,7 @@
     width: 30px;
     height: 100vh;
 
-    left: 30vw;
-    transform: translateX(-15px);
+    transform: translateX(335px);
 
     position: fixed;
 
@@ -43,7 +43,9 @@
     align-items: center;
     justify-content: center;
 
-    transition: 0.1s left;
+    transition: 0.1s transform;
+
+    z-index: 998;
 }
 
 #sidebar-chevron #chevron-container {
