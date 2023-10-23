@@ -1,9 +1,9 @@
 #sidebar-container {
-    width: 350px;
+    width: 500px;
 
     height: 100vh;
 
-    background-color: rgb(167, 167, 167);
+    background-color: rgb(235, 235, 235);
 
     position: fixed;
 
@@ -19,7 +19,7 @@
 }
 
 #sidebar-chevron:has(#chevron-container input:checked) + #sidebar-container {
-    transform: translateX(-335px);
+    transform: translateX(-485px);
 }
 
 #sidebar-chevron:has(#chevron-container input:checked) {
@@ -34,7 +34,7 @@
     width: 30px;
     height: 100vh;
 
-    transform: translateX(335px);
+    transform: translateX(485px);
 
     position: fixed;
 
@@ -50,21 +50,25 @@
 
 #sidebar-chevron #chevron-container {
     width: 15px;
-    height: 5rem;
+    height: 3rem;
 
-    background-color: gray;
+    background-color: rgb(235, 235, 235);
 
     display: flex;
 
     align-items: center;
     justify-content: center;
 
-    border: 2px solid darkgray;
-    border-radius: 7px;
+    border: 1px solid rgb(220, 220, 220);
+    border-radius: 2px;
 
     cursor: pointer;
 
     user-select: none;
+}
+
+#chevron-container:hover {
+    filter: brightness(110%);
 }
 
 #sidebar-chevron img {
