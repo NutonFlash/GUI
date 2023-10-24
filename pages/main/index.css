@@ -1,0 +1,94 @@
+#sidebar-container {
+    width: 500px;
+
+    height: 100vh;
+
+    background-color: rgb(235, 235, 235);
+
+    position: fixed;
+
+    overflow-x: auto;
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+
+    flex-wrap: wrap;
+
+    transition: 0.1s transform;
+}
+
+#sidebar-chevron:has(#chevron-container input:checked) + #sidebar-container {
+    transform: translateX(-485px);
+}
+
+#sidebar-chevron:has(#chevron-container input:checked) {
+    transform: translateX(0px);
+}
+
+#chevron-container:has(input:checked) img {
+    rotate: 180deg;
+}
+
+#sidebar-chevron {
+    width: 30px;
+    height: 100vh;
+
+    transform: translateX(485px);
+
+    position: fixed;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.1s transform;
+
+    z-index: 998;
+}
+
+#sidebar-chevron #chevron-container {
+    width: 15px;
+    height: 3rem;
+
+    background-color: rgb(235, 235, 235);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgb(220, 220, 220);
+    border-radius: 2px;
+
+    cursor: pointer;
+
+    user-select: none;
+}
+
+#chevron-container:hover {
+    filter: brightness(110%);
+}
+
+#sidebar-chevron img {
+    width: 100%;
+}
+
+#map {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    z-index: 0;
+    background-color: silver;
+}
+
+.visually-hidden {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}

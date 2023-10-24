@@ -4,15 +4,47 @@
 <head>
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <title>Hello World!</title>
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;">
+    <title>Vehicle Interface</title>
+    <script src="./index.js"></script>
+    <link rel="stylesheet" href="./index.css">
+
 </head>
 
 <body>
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
+    <div id="alert-container">
+        <div id="alert">
+            <h1 id="alert-title"></h1>
+            <h2 id="alert-content"></h2>
+            <button id="alert-close" onclick="hideAlert()">Close</button>
+        </div>
+    </div>
+    <div class="container">
+        <h1 style="color:green;">광주85사1004</h1>
+
+        <div class="bordered" id="car-details">
+
+        </div>
+
+        <p class="spaced-paragraph"></p>
+
+        <button class="edit-button" onclick="handleEdit()">수정 </button>
+
+        <button class="confirm-button" onclick="handleConfirm()">확인 </button>
+
+        <div class="button-container">
+            <button class="my-button" onclick="handleClick()">
+                <span class="icon">🚚</span>기타운행
+            </button>
+        </div>
+
+        <p class="dot-sentence">배차정보가 맞으면<span Class="bold-text"> 확인 </span>을 클릭해 주세요.</P>
+
+        <p>(<span Class="bold-text"> 정정 </span>을 누르시면 배차정보가 갱신됩니다.)
+        <p>
+
+        <div style="position:absolute;left:-9999em;"></div>
 </body>
 
 </html>

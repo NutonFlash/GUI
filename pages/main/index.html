@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <script type="text/javascript"
+        src="http://dapi.kakao.com/v2/maps/sdk.js?appkey=3137a59c7a30af330760cfac110fa73e"></script>
+    <script src="./index.js"></script>
+    <link rel="stylesheet" href="./index.css">
+</head>
+
+<body style="overflow: hidden; margin: 0; padding: 0;">
+    <div id="map">MAP_NOT_LOADED
+    </div>
+    <div id="sidebar">
+        <div id="sidebar-chevron">
+            <label id="chevron-container" for="sidebar-toggle">
+                <img src="../../src/UI/chevron-left-black.svg"><input type="checkbox" id="sidebar-toggle"
+                    class="visually-hidden">
+            </label>
+        </div>
+        <div id="sidebar-container">
+            <h1>Sidebar</h1><button id="backBtn" style="position:absolute; z-index: 1;right: 0;">BACK</button>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
