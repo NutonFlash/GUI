@@ -1,3 +1,12 @@
+@font-face {
+    font-family: 'NotoSansKR';
+    src: url('../../src/fonts/NotoSansKR.ttf');
+}
+
+* {
+    font-family: 'NotoSansKR';
+}
+
 #sidebar-container {
     width: 500px;
 
@@ -7,7 +16,7 @@
 
     position: fixed;
 
-    overflow-x: auto;
+    overflow-x: hidden;
     overflow-y: auto;
 
     display: flex;
@@ -91,4 +100,243 @@
     position: absolute;
     white-space: nowrap;
     width: 1px;
+}
+
+#sidebar-container .top-bar {
+    padding: 0.3rem;
+    padding-left: 2rem;
+    background-color: green;
+    color: white;
+    font-weight: bold;
+}
+
+.car-info {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    padding-left: 0;
+}
+
+.car-info #car-detail {
+    padding: 0.5rem;
+
+    width: 75%;
+
+    border: 2px solid green;
+
+    border-top-left-radius: 7px;
+    border-bottom-left-radius: 7px;
+}
+
+.car-info #dropdown-misc {
+    width: 2rem;
+
+    border: 2px solid green;
+    border-left: none;
+
+    border-top-right-radius: 7px;
+    border-bottom-right-radius: 7px;
+
+    cursor: pointer;
+}
+
+.eco-rating-container {
+    display: flex;
+    color: green;
+    align-items: baseline;
+
+    padding-left: 3rem;
+    margin-bottom: 1rem;
+}
+
+.eco-rating-container .eco-img {
+    width: 2.5rem;
+    padding-bottom: 1rem;
+}
+
+.eco-rating-container #eco-rating {
+    font-size: 4rem;
+    font-weight: bold;
+}
+
+.eco-rating-container .eco-jeom {
+    font-size: 2rem;
+    height: fit-content;
+}
+
+.drive-stats {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    margin-bottom: 1rem;
+}
+
+.drive-stats .drive-stat {
+    width: 28%;
+    height: 6rem;
+
+    border: 1px solid lightgreen;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
+    padding-top: 0.3rem;
+
+    color: darkslategray;
+}
+
+.drive-stat .stats-label {
+    margin-bottom: 1rem;
+}
+
+.drive-stat > div .stat-main {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.drive-stat > div .stat-sub {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.drive-stat > div .lbl-med {
+    font-size: 1.3rem;
+}
+
+.drive-stat > div .lbl-small {
+    font-size: 1rem;
+}
+
+.garbage-stats {
+    display: flex;
+    flex-direction: column;
+
+    width: 85%;
+
+    transform: translateX(-0.5rem);
+
+    border: 1px solid lightgreen;
+
+    border-radius: 7px;
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.garbage-stats .garbage-overview {
+    display: flex;
+
+    justify-content: space-around;
+
+    width: 100%;
+    height: 4rem;
+
+    border-bottom: 1px solid lightgreen;
+}
+
+.garbage-overview .garbage-totalcount {
+    flex-grow: 6;
+    width: 42%;
+
+    display: flex;
+
+    justify-content: center;
+
+    line-height: 4rem;
+}
+
+.garbage-totalcount #garbage-totalcount {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.garbage-totalcount label {
+    color: green;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.garbage-overview .garbage-avg {
+    width: 16%;
+
+    display: flex;
+    flex-direction: column;
+
+    background-color: green;
+
+    color: white;
+
+    text-align: center;
+}
+
+.garbage-avg label {
+    border-bottom: 2px solid white;
+    font-size: 0.8rem;
+}
+
+.garbage-avg span {
+    font-weight: bold;
+    font-size: 1.5rem;
+
+    line-height: 2.5rem;
+}
+
+.garbage-overview .garbage-totalweight {
+    flex-grow: 6;
+    width: 42%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.garbage-totalweight #garbage-totalweight {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.garbage-totalweight label {
+    color: green;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.garbage-details {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    width: 100%;
+}
+
+.garbage-details .garbage-stat {
+    width: 6rem;
+    height: 4rem;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.5rem;
+    font-weight: bold;
+
+    color: darkslategray;
+
+    flex-grow: 1;
+}
+
+.garbage-stat img {
+    margin-right: 0.5rem;
+}
+
+.garbage-stat span {
+    width: 3rem;
 }
