@@ -1,3 +1,12 @@
+@font-face {
+    font-family: 'NotoSansKR';
+    src: url('../../src/fonts/NotoSansKR.ttf');
+}
+
+* {
+    font-family: 'NotoSansKR';
+}
+
 body {
     display: flex;
     justify-content: center;
