@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'NotoSansKR';
-    src: url('../../src/fonts/NotoSansKR.ttf');
+    src: url('../../fonts/NotoSansKR.ttf');
 }
 
 * {
@@ -260,6 +260,7 @@
     color: green;
     font-weight: bold;
     font-size: 1.5rem;
+    line-height: 4.4rem;
 }
 
 .garbage-overview .garbage-avg {
@@ -306,6 +307,8 @@
     color: green;
     font-weight: bold;
     font-size: 1.5rem;
+
+    transform: translateY(0.2rem);
 }
 
 .garbage-details {
@@ -339,4 +342,104 @@
 
 .garbage-stat span {
     width: 3rem;
+}
+
+.right-overlay {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+
+    justify-content: flex-end;
+    align-items: flex-end;
+
+    padding: 1rem;
+
+    width: 20rem;
+    right: 0;
+}
+
+.vehicle-speed-container {
+    width: 10rem;
+    height: 8rem;
+
+    margin-top: 1rem;
+
+    padding-top: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+
+    border-radius: 5px;
+
+    background-color: rgba(255, 255, 255, 0.75);
+    border: 1px solid lightgreen;
+}
+
+.vehicle-speed {
+    color: rgb(83, 138, 232);
+
+    margin-bottom: 1rem;
+}
+
+.vehicle-speed #vehicle-speed {
+    font-size: 4rem;
+    font-weight: bold;
+
+    display: inline-block;
+    line-height: 3rem;
+}
+
+.vehicle-speed .lbl-med {
+    font-size: 1.7rem;
+}
+
+.vehicle-rpm {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.vehicle-rpm #vehicle-rpm {
+    margin-left: 0.5rem;
+}
+
+.right-overlay > div {
+    height: 49vh;
+}
+
+.right-overlay-bottom {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.right-overlay-bottom > a {
+    width: 4rem;
+    height: 4rem;
+    background-color: rgba(255, 255, 255, 0.55);
+    text-align: center;
+    border: 1px solid rgb(218, 218, 218);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-direction: column;
+
+    margin-bottom: 1rem;
+}
+
+.right-overlay-bottom > a:first-child {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.right-overlay-bottom > a:last-child {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.right-overlay-bottom > a > img {
+    width: 50%;
 }
