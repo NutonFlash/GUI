@@ -1,7 +1,7 @@
 window.onload = () => {
     document.getElementById('backBtn').onclick = () => {
         let t = document.createElement('a');
-        t.href = '../../index.html';
+        t.href = '../login/index.html';
         t.click();
     };
 
