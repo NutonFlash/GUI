@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const { app, BrowserWindow, ipcMain } = require('electron');
 
+const entryPoint = 'src/pages/login';
 const createWindow = () => {
     const win = new BrowserWindow({
         width: 1280,
@@ -11,7 +12,7 @@ const createWindow = () => {
         },
     });
 
-    win.loadFile('index.html');
+    win.loadFile(entryPoint + '/index.html');
 };
 
 app.whenReady().then(() => {
