@@ -45,7 +45,7 @@ function handleConfirm() {
         } else showAlert('Invalid Credentials');
     } else {
         let t = document.createElement('a');
-        t.href = './pages/main/index.html';
+        t.href = '../main/index.html';
         t.click();
     }
 }
