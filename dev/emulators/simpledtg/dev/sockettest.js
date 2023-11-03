@@ -3,48 +3,24 @@ const net = require('node:net');
 const client = net.createConnection({ port: '3999', host: '127.0.0.1' }, () => {
     console.log('Connected');
 
-    client.write(
-        JSON.stringify({
-            action: 'test',
-            payload: { contents: { a: 'hi1', b: { bee: 'b' } }, foo: 'bar' },
-        }),
-    );
-
     setTimeout(() => {
         client.write(
             JSON.stringify({
-                action: 'test',
+                event: 'dtg',
                 payload: {
-                    contents: { a: 'hi2', b: { bee: 'b' } },
-                    foo: 'bar',
+                    action: 'init',
+                    data: {
+                        lat: 36.339712,
+                        lng: 127.4445824,
+                    },
                 },
             }),
         );
-    }, 3000);
-
-    setTimeout(() => {
-        client.write(
-            JSON.stringify({
-                action: 'test',
-                payload: {
-                    contents: { a: 'hi3', b: { bee: 'b' } },
-                    foo: 'bar',
-                },
-            }),
-        );
-    }, 5000);
-
-    setTimeout(() => {
-        client.write(
-            JSON.stringify({
-                action: 'close',
-            }),
-        );
-    }, 7000);
+    }, 1000);
 
     setTimeout(() => {
         client.end();
-    }, 12000);
+    }, 5000);
 });
 
 client.on('data', (data) => {
