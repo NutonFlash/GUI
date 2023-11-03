@@ -1,24 +1,23 @@
-package events
+package event
 
 import (
-	"GUI/simpledtg/src/server/handlers"
-	"net"
+	"GUI/simpledtg/src/server/connection"
+	"GUI/simpledtg/src/server/handler"
 )
 
 type SocketEvent struct {
-	Action  string                 `json:"action"`
+	Event   string                 `json:"event"`
 	Payload map[string]interface{} `json:"payload"`
 }
 
-func (e *SocketEvent) Handle(connection *net.Conn, send func(v any)) {
-	//handle events
-	switch e.Action {
+func (e *SocketEvent) Handle(conn *connection.DTGConnection, send func(v any)) {
+	//handle event
+	switch e.Event {
 	case "test":
-		res := handlers.TestHandler(&e.Payload)
-		send(res)
+		send(handler.TestHandler(&e.Payload))
 		break
-	case "close":
-		(*connection).Close()
+	case "dtg":
+		send(handler.DTGHandler(&e.Payload, conn))
 		break
 	}
 }

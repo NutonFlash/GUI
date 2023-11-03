@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 type TestResponse struct {
 	Msg string `json:"msg"`

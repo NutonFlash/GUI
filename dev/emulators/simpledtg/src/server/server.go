@@ -1,14 +1,14 @@
 package server
 
 import (
-	"GUI/simpledtg/src/server/events"
+	connection2 "GUI/simpledtg/src/server/connection"
+	"GUI/simpledtg/src/server/event"
 	"encoding/json"
 	"fmt"
 	"net"
-	"os"
 )
 
-// server options & defaults
+// Options contain the server's options
 type Options struct {
 	Host      string
 	Port      string
@@ -38,13 +38,14 @@ func useType(type_ string) ServerOption {
 
 type Server struct {
 	Options
+	Listener *net.Listener
 }
 
 func defaultOptions() Options {
 	return Options{"localhost", ":3999", "tcp", false}
 }
 
-// creates a new socket server
+// CreateServer creates a new socket server
 func CreateServer(options ...*ServerOption) *Server {
 	opts := defaultOptions()
 
@@ -52,11 +53,11 @@ func CreateServer(options ...*ServerOption) *Server {
 		(*option)(&opts)
 	}
 
-	s := &Server{opts}
+	s := &Server{opts, nil}
 	return s
 }
 
-// starts socket server
+// Start starts socket server
 func (s *Server) Start() {
 	s.isRunning = true
 
@@ -64,20 +65,15 @@ func (s *Server) Start() {
 	server, err := net.Listen(s.Type, s.Host+s.Port)
 	if err != nil {
 		fmt.Println("error starting server:", err.Error())
-		os.Exit(1)
+		return
 	}
 
-	defer server.Close()
+	s.Listener = &server
 
 	fmt.Printf("Server started at %s%s\n", s.Host, s.Port)
 
 	//listen to connections
-	for {
-		if !s.isRunning {
-			fmt.Printf("Server %s%s Stopped\n", s.Host, s.Port)
-			break
-		}
-
+	for s.isRunning {
 		connection, err := server.Accept()
 		if err != nil {
 			fmt.Println("error accepting client: ", err.Error())
@@ -86,10 +82,14 @@ func (s *Server) Start() {
 			go s.process(connection)
 		}
 	}
+
+	fmt.Printf("Server %s%s Stopped\n", s.Host, s.Port)
 }
 
 func (s *Server) Stop() {
+	fmt.Println("Stopping server")
 	s.isRunning = false
+	(*s.Listener).Close()
 }
 
 type ErrorResponse struct {
@@ -109,36 +109,46 @@ func sendResponse(connection *net.Conn) func(v any) {
 }
 
 func (s *Server) process(connection net.Conn) {
-	// while connection persists wait for and handle events
+	conn := connection2.DTGConnection{Con: &connection, IsOpen: true}
+
+	// while connection persists wait for and handle event
 	for {
-		if !s.isRunning {
+		if !s.isRunning || !conn.IsOpen {
+			conn.Close()
 			break
 		}
 
 		buffer := make([]byte, 1024)
-		mLen, err := connection.Read(buffer)
+		mLen, err := (*conn.Con).Read(buffer)
 		if err != nil {
-			fmt.Println("Error reading:", err.Error())
-			connection.Close()
-			break
+			conn.Close()
+			errMsg := err.Error()
+			if errMsg != "EOF" {
+				fmt.Println("error reading:", err.Error())
+			}
 		} else {
 
-			event := events.SocketEvent{}
+			evt := event.SocketEvent{}
 
-			err := json.Unmarshal(buffer[:mLen], &event)
+			err := json.Unmarshal(buffer[:mLen], &evt)
 			if err != nil {
 				fmt.Println("error unmarshalling json")
 				continue
 			}
 
-			fmt.Println(event)
-			event.Handle(&connection, sendResponse(&connection))
+			fmt.Println(evt)
+			evt.Handle(&conn, sendResponse(conn.Con))
 
-			if event.Action == "close" {
-				connection.Close()
+			if evt.Event == "close" {
+				conn.Close()
+			}
+
+			if evt.Event == "stop" {
+				conn.Close()
 				s.Stop()
-				break
 			}
 		}
 	}
+
+	fmt.Println("Thread Process Closed")
 }

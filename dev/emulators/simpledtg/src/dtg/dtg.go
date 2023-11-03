@@ -5,50 +5,62 @@ import (
 	"time"
 )
 
+// Truck Limitations
+const (
+	FactorLatLng = 100_000
+	TickSpeed    = 16
+	SpeedLimit   = 50
+	MaxAccel     = 35
+	MaxSpeed     = 80
+)
+
+type LatLng struct {
+	Lat int32 `json:"lat"`
+	Lng int32 `json:"lng"`
+}
+
+func (l *LatLng) String() (string, string) {
+	return fmt.Sprintf("%d.%d", l.Lat/FactorLatLng, l.Lat%FactorLatLng), fmt.Sprintf("%d.%d", l.Lng/FactorLatLng, l.Lng%FactorLatLng)
+}
+
+// DTG assumes that 1 DD is equal to 1 meter.
 type DTG struct {
-	Lat          float64
-	Lng          float64
-	VecLat       float64
-	VecLng       float64
-	Acceleration float64
-	RunTime      time.Duration
-	Distance     float64
-	Overspeed    float64
-	IdleTime     time.Duration
-	SuddenAccel  int16
-	SuddenBrake  int16
-	VehicleID    string
-	DriverID     string
-	isRunning    bool
+	LatLng        LatLng        `json:"latlng"`       // LatLng is the position of the vehicle in Decimal Degrees (DD)
+	Speed         uint8         `json:"speed"`        // Speed of the vehicle in Decimal Degrees (DD)
+	Orientation   uint16        `json:"orientation"`  // Orientation of the vehicle in Decimal Degrees (DD)
+	Acceleration  int8          `json:"acceleration"` // Acceleration of the vehicle in Decimal Degrees (DD)
+	RunTime       time.Duration `json:"runtime"`      // RunTime is the total time elapsed since Run() in Milliseconds
+	Distance      int32         `json:"distance"`     // Distance travelled by the vehicle since Run() in Decimal Degrees (DD)
+	OverSpeed     int32         `json:"overspeed"`    // OverSpeed is the total distance travelled by the vehicle during speeds of over SpeedLimit in Decimal Degrees (DD)
+	IdleTime      time.Duration `json:"idle_time"`    // IdleTime is the total time elapsed while engine is on and 0 vector and acceleration in Milliseconds
+	SuddenAccel   int16         `json:"sudden_accel"` // SuddenAccel is the total amount of times that the vehicle had a high rate of acceleration
+	SuddenBrake   int16         `json:"sudden_brake"` // SuddenBrake is the total amount of times that the vehicle had a high rate of deceleration
+	VehicleID     string        `json:"vehicle_id"`
+	DriverID      string        `json:"driver_id"`
+	EngineRunning bool          `json:"engine_running"`
+	nextTick      time.Time
+	isRunning     bool
 }
 
-type Values struct {
-	Lat          float64
-	Lng          float64
-	Speed        float64
-	Acceleration float64
-}
+func (dtg *DTG) _Run() {
+	for dtg.isRunning {
+		dtg.nextTick = time.Now().Add(TickSpeed * time.Millisecond)
+		dtg.RunTime += TickSpeed * time.Millisecond
 
-func (dtg *DTG) _Run(c chan Values) {
-	for {
-		if !dtg.isRunning {
-			break
-		}
+		time.Sleep(time.Until(dtg.nextTick))
 	}
+	fmt.Println("DTG Stopped")
 }
 
-func (dtg *DTG) Run() chan Values {
+// Run runs dtg in a goroutine
+func (dtg *DTG) Run() {
 	dtg.isRunning = true
-
-	c := make(chan Values)
-
-	go dtg._Run(c)
-
-	return c
+	go dtg._Run()
 }
 
-func (dtg *DTG) Stop() {
+func (dtg *DTG) End() {
 	dtg.isRunning = false
+	fmt.Println("Stopping DTG")
 }
 
 func (dtg *DTG) Accelerate() {}
@@ -57,10 +69,13 @@ func (dtg *DTG) Brake() {}
 
 func (dtg *DTG) Turn() {}
 
-func CreateDTG(lat float64, lng float64) *DTG {
+func (dtg *DTG) Engine(on bool) {
+	dtg.EngineRunning = on
+}
+
+func CreateDTG(lat int32, lng int32) *DTG {
 	dtg := DTG{}
-	dtg.Lat = lat
-	dtg.Lng = lng
+	dtg.LatLng = LatLng{lat, lng}
 
 	fmt.Println(dtg)
 	return &dtg
