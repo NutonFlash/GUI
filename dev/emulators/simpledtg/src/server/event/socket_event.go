@@ -17,7 +17,7 @@ func (e *SocketEvent) Handle(conn *connection.DTGConnection, send func(v any)) {
 		send(handler.TestHandler(&e.Payload))
 		break
 	case "dtg":
-		send(handler.DTGHandler(&e.Payload, conn))
+		handler.DTGHandler(&e.Payload, conn, send)
 		break
 	}
 }

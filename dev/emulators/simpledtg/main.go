@@ -10,7 +10,7 @@ func main() {
 	s := server.CreateServer()
 	go s.Start()
 
-	time.Sleep(10 * time.Second)
+	time.Sleep(30 * time.Second)
 	fmt.Println("Force Closing")
 	s.Stop()
 
