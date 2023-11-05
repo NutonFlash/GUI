@@ -3,6 +3,7 @@ package main
 import (
 	"GUI/simpledtg/src/server"
 	"flag"
+	"fmt"
 	"time"
 )
 
@@ -11,7 +12,10 @@ func main() {
 	flag.Parse()
 
 	wss := server.CreateWSServer(server.UsePort(":" + *port))
-	time.Sleep(30 * time.Second)
-	wss.Stop()
-	time.Sleep(1 * time.Second)
+
+	for wss.Options.IsRunning {
+		time.Sleep(time.Second * 3)
+	}
+
+	fmt.Println("Server Stopped")
 }

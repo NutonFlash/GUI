@@ -1,6 +1,7 @@
 package server
 
 import (
+	"GUI/simpledtg/src/dtg/pool"
 	"GUI/simpledtg/src/server/connection"
 	"GUI/simpledtg/src/server/event"
 	"context"
@@ -13,6 +14,7 @@ import (
 type WSServer struct {
 	Options Options
 	srv     *http.Server
+	DTGPool *pool.DTGPool
 }
 
 func CreateWSServer(options ...ServerOption) *WSServer {
@@ -22,18 +24,26 @@ func CreateWSServer(options ...ServerOption) *WSServer {
 	}
 
 	opts.Type = "wss"
-	opts.isRunning = true
+	opts.IsRunning = true
 
 	serv := http.Server{Addr: opts.Port}
-	wss := WSServer{opts, &serv}
+	wss := WSServer{opts, &serv, pool.NewPool()}
 
 	http.HandleFunc("/dtg", wss.HandeConnectDTG())
+	http.HandleFunc("/shutdown", wss.HandleShutdown())
 
 	go func() {
 		serv.ListenAndServe()
 	}()
 
 	return &wss
+}
+
+func (wss *WSServer) HandleShutdown() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("Shutting Down"))
+		wss.Stop()
+	}
 }
 
 func (wss *WSServer) HandeConnectDTG() http.HandlerFunc {
@@ -46,9 +56,9 @@ func (wss *WSServer) HandeConnectDTG() http.HandlerFunc {
 		}
 
 		go func() {
-			conn := connection.DTGConnection{WSCon: c}
+			conn := connection.DTGConnection{WSCon: c, DTGPool: wss.DTGPool, IsOpen: true}
 
-			for wss.Options.isRunning {
+			for wss.Options.IsRunning {
 				ctx := context.WithoutCancel(r.Context())
 
 				var evt event.SocketEvent
@@ -58,14 +68,19 @@ func (wss *WSServer) HandeConnectDTG() http.HandlerFunc {
 					break
 				}
 
-				evt.Handle(&conn, func(v any) {
-					wsjson.Write(ctx, c, v)
+				evt.Handle(&conn, func(v any) error {
+					return wsjson.Write(ctx, c, v)
 				})
 
 				if evt.Event == "close" {
-					fmt.Println("Close Command Received")
+					fmt.Println("Close Command Invoked")
 					conn.Close()
 					break
+				}
+
+				if evt.Event == "shutdown" {
+					fmt.Println("Shutdown Invoked")
+					wss.Stop()
 				}
 			}
 			conn.Close()
@@ -76,10 +91,10 @@ func (wss *WSServer) HandeConnectDTG() http.HandlerFunc {
 }
 
 func (wss *WSServer) Stop() {
-	if !wss.Options.isRunning {
+	if !wss.Options.IsRunning {
 		return
 	}
 
-	wss.Options.isRunning = false
+	wss.Options.IsRunning = false
 	wss.srv.Shutdown(context.Background())
 }

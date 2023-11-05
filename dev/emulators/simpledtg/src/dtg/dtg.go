@@ -54,37 +54,39 @@ type DTG struct {
 	EngineRunning bool   `json:"engine_running"`
 	FactorDeg     int    `json:"factor_deg"`
 	FactorSpeed   int    `json:"factor_speed"`
+	ID            string `json:"id"`
 	isBraking     bool
 	nextTick      time.Time
 	isRunning     bool
 	startTime     time.Time
-	send          func(v any)
+	sends         []func(v any) error
+	ended         func(id string)
 }
 
-func (dtg *DTG) _Run() {
+func (_dtg *DTG) _Run() {
 	elapsed := time.Since(time.Now())
-	for dtg.isRunning {
-		dtg.nextTick = time.Now().Add(TickSpeed * time.Millisecond)
+	for _dtg.isRunning {
+		_dtg.nextTick = time.Now().Add(TickSpeed * time.Millisecond)
 
-		if dtg.EngineRunning {
-			elapsed = time.Since(dtg.startTime)
+		if _dtg.EngineRunning {
+			elapsed = time.Since(_dtg.startTime)
 
-			dtg.RunTime += elapsed.Milliseconds()
-			dtg.startTime = time.Now()
+			_dtg.RunTime += elapsed.Milliseconds()
+			_dtg.startTime = time.Now()
 		}
 
-		if dtg.Acceleration > 0 {
-			accel := dtg.Acceleration
+		if _dtg.Acceleration > 0 {
+			accel := _dtg.Acceleration
 
-			if dtg.isBraking {
+			if _dtg.isBraking {
 				accel *= -1
 			}
 
-			dtg.Speed = max(min(dtg.Speed+speedPerTick(accel, elapsed), MaxSpeed), 0)
+			_dtg.Speed = max(min(_dtg.Speed+speedPerTick(accel, elapsed), MaxSpeed), 0)
 		}
 
-		if dtg.Speed > 0 {
-			theta := dtg.Orientation
+		if _dtg.Speed > 0 {
+			theta := _dtg.Orientation
 
 			// signs per quadrant
 			SignsLng := [4]int64{-1, -1, 1, 1}
@@ -96,7 +98,7 @@ func (dtg *DTG) _Run() {
 			var quadrant int
 
 			// reverse signs if braking
-			if dtg.isBraking {
+			if _dtg.isBraking {
 				sLng = -1
 				sLat = -1
 			}
@@ -115,103 +117,129 @@ func (dtg *DTG) _Run() {
 			}
 
 			// calculate displacement vector
-			dLat := sLat * int64(float64(speedPerTick(dtg.Speed, elapsed))*(getLatFunc(quadrant)(ToRad(theta))))
-			dLng := sLng * int64(float64(speedPerTick(dtg.Speed, elapsed))*(getLngFunc(quadrant)(ToRad(theta))))
+			dLat := sLat * int64(float64(speedPerTick(_dtg.Speed, elapsed))*(getLatFunc(quadrant)(ToRad(theta))))
+			dLng := sLng * int64(float64(speedPerTick(_dtg.Speed, elapsed))*(getLngFunc(quadrant)(ToRad(theta))))
 
-			dtg.LatLng.Lat += dLat
-			dtg.LatLng.Lng += dLng
+			_dtg.LatLng.Lat += dLat
+			_dtg.LatLng.Lng += dLng
 
 			d := IntAbs(dLat) + IntAbs(dLng)
 
-			dtg.Distance += d
-			if dtg.Speed > SpeedLimit {
-				dtg.OverSpeed += d
+			_dtg.Distance += d
+			if _dtg.Speed > SpeedLimit {
+				_dtg.OverSpeed += d
 			}
 
 		} else {
-			if dtg.EngineRunning {
-				dtg.IdleTime += TickSpeed
+			if _dtg.EngineRunning {
+				_dtg.IdleTime += TickSpeed
 			}
 
-			if dtg.isBraking {
-				dtg.isBraking = false
-				dtg.Acceleration = 0
+			if _dtg.isBraking {
+				_dtg.isBraking = false
+				_dtg.Acceleration = 0
 			}
 		}
 
-		dtg.send(*dtg)
-		time.Sleep(time.Until(dtg.nextTick))
+		go func() {
+			nilCount := 0
+			for idx, send := range _dtg.sends {
+				if send != nil {
+					err := send(*_dtg)
+					if err != nil {
+						_dtg.sends[idx] = nil
+						nilCount++
+					}
+				} else {
+					nilCount++
+				}
+			}
+
+			if nilCount == len(_dtg.sends) {
+				_dtg.End()
+			}
+		}()
+
+		time.Sleep(time.Until(_dtg.nextTick))
 	}
+	_dtg.ended(_dtg.ID)
 	fmt.Println("DTG Stopped")
 }
 
-// Run runs dtg in a goroutine
-func (dtg *DTG) Run() {
-	dtg.isRunning = true
-	go dtg._Run()
+func (_dtg *DTG) BindRecv(send func(v any) error) {
+	_dtg.sends[1] = send
 }
 
-func (dtg *DTG) End() {
-	dtg.isRunning = false
+// Run runs dtg in a goroutine
+func (_dtg *DTG) Run() {
+	_dtg.isRunning = true
+	go _dtg._Run()
+}
+
+func (_dtg *DTG) End() {
+	_dtg.isRunning = false
 	fmt.Println("Stopping DTG")
 }
 
-func (dtg *DTG) Accelerate(accel Accel) {
-	if !dtg.EngineRunning {
+func (_dtg *DTG) Accelerate(accel Accel) {
+	if !_dtg.EngineRunning {
 		return
 	}
 
-	prevAcc := dtg.Acceleration
+	prevAcc := _dtg.Acceleration
 
-	dtg.isBraking = false
-	dtg.Acceleration = int32(accel) * BaseAccel
+	_dtg.isBraking = false
+	_dtg.Acceleration = toAcceleration(accel)
 
-	if prevAcc != int32(accel-1)*BaseAccel {
-		dtg.SuddenAccel++
+	if prevAcc != toAcceleration(accel-1) {
+		_dtg.SuddenAccel++
 	}
 }
 
-func (dtg *DTG) Brake(accel Accel) {
-	prevAcc := dtg.Acceleration
-	wasBraking := dtg.isBraking
+func (_dtg *DTG) Brake(accel Accel) {
+	prevAcc := _dtg.Acceleration
+	wasBraking := _dtg.isBraking
 
-	dtg.Acceleration = int32(accel) * BaseAccel
-	dtg.isBraking = true
+	_dtg.Acceleration = toBrakeAcceleration(accel)
+	_dtg.isBraking = true
 
 	if !wasBraking {
-		if dtg.Acceleration > int32(Accel_Low)*BaseAccel {
-			dtg.SuddenBrake++
+		if accel != Accel_Low {
+			_dtg.SuddenBrake++
 		}
 	} else {
-		if prevAcc != int32(accel-1)*BaseAccel {
-			dtg.SuddenBrake++
+		if prevAcc > _dtg.Acceleration && prevAcc != toBrakeAcceleration(accel-1) {
+			_dtg.SuddenBrake++
 		}
 	}
 }
 
 // Turn degree has 2 decimal precision
-func (dtg *DTG) Turn(deg uint16) {
-	dtg.Orientation = (dtg.Orientation + deg) % (360 * FactorDeg)
+func (_dtg *DTG) Turn(deg uint16) {
+	_dtg.Orientation = (_dtg.Orientation + deg) % (360 * FactorDeg)
 }
 
-func (dtg *DTG) Engine(on bool) {
-	dtg.EngineRunning = on
+func (_dtg *DTG) Engine(on bool) {
+	_dtg.EngineRunning = on
 
-	dtg.startTime = time.Now()
+	_dtg.startTime = time.Now()
 
-	if !dtg.EngineRunning {
-		dtg.Brake(Accel_Low)
+	if !_dtg.EngineRunning {
+		_dtg.Brake(Accel_Low)
 	} else {
-		dtg.startTime = time.Now()
+		_dtg.startTime = time.Now()
 	}
 }
 
-func CreateDTG(lat int64, lng int64, send func(v any)) *DTG {
-	dtg := DTG{FactorDeg: FactorDeg, FactorSpeed: 1_000}
-	dtg.LatLng = LatLng{lat, lng, FactorLatLng}
-	dtg.send = send
+func CreateDTG(lat int64, lng int64, send func(v any) error, ended func(id string)) *DTG {
+	_dtg := DTG{FactorDeg: FactorDeg, FactorSpeed: 1_000}
+	_dtg.LatLng = LatLng{lat, lng, FactorLatLng}
 
-	return &dtg
+	_dtg.sends = make([]func(v any) error, 2)
+	_dtg.sends[0] = send
+	_dtg.ended = ended
+
+	return &_dtg
 }
 
 func IntAbs(n int64) int64 {
@@ -242,4 +270,12 @@ func getLatFunc(quadrant int) func(f float64) float64 {
 
 func speedPerTick(speed int32, elapsed time.Duration) int32 {
 	return int32(float32(speed) * (float32(elapsed.Milliseconds()) / 1000.0))
+}
+
+func toBrakeAcceleration(accel Accel) int32 {
+	return toAcceleration(accel) * 6
+}
+
+func toAcceleration(accel Accel) int32 {
+	return int32(accel) * BaseAccel
 }
