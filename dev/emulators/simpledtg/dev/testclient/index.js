@@ -1,47 +1,4 @@
 window.onload = () => {
-    // const socket = io('ws://localhost:3999/dtg', { transports: ['websocket'] });
-    // setTimeout(() => {
-    //     console.log('CONNECTED');
-    //     socket.emit(
-    //         'data',
-    //         JSON.stringify({
-    //             event: 'test',
-    //             payload: {
-    //                 contents: {
-    //                     a: 'REEEEEEEEEEEEEEEEE',
-    //                 },
-    //             },
-    //         }),
-    //     );
-    //     setTimeout(() => {
-    //         socket.emit(
-    //             'data',
-    //             JSON.stringify({
-    //                 event: 'close',
-    //                 payload: {
-    //                     contents: {
-    //                         a: 'REEEEEEEEEEEEEEEEE',
-    //                     },
-    //                 },
-    //             }),
-    //         );
-    //     }, 9000);
-    //     socket.onAny((name, args) => {
-    //         console.log(name);
-    //         console.log(args);
-    //     });
-    // }, 3000);
-    // socket.send(
-    //     JSON.stringify({
-    //         event: 'test',
-    //         payload: {
-    //             contents: {
-    //                 a: 'REEEEEEEEEEEEEEEEE',
-    //             },
-    //         },
-    //     }),
-    // );
-    // let socket = new WebSocket('ws://172.24.208.1:3999/dtg');
     let socket = new WebSocket('ws://localhost:3999/dtg');
     socket.addEventListener('open', () => {
         console.log('Socket opened');
@@ -136,7 +93,7 @@ window.onload = () => {
         //             event: 'dtg',
         //             payload: {
         //                 action: 'brake',
-        //                 accel: 'high',
+        //                 brake: 'high',
         //             },
         //         }),
         //     );
@@ -163,7 +120,7 @@ window.onload = () => {
                     },
                 }),
             );
-        }, 25000);
+        }, 60000);
     });
     socket.addEventListener('message', (evt) => {
         console.log(evt.data);

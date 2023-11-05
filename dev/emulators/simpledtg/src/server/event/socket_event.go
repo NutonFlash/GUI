@@ -10,7 +10,7 @@ type SocketEvent struct {
 	Payload map[string]interface{} `json:"payload"`
 }
 
-func (e *SocketEvent) Handle(conn *connection.DTGConnection, send func(v any)) {
+func (e *SocketEvent) Handle(conn *connection.DTGConnection, send func(v any) error) {
 	//handle event
 	switch e.Event {
 	case "test":

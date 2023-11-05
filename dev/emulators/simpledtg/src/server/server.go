@@ -1,6 +1,7 @@
 package server
 
 import (
+	"GUI/simpledtg/src/dtg/pool"
 	connection2 "GUI/simpledtg/src/server/connection"
 	"GUI/simpledtg/src/server/event"
 	"encoding/json"
@@ -13,7 +14,7 @@ type Options struct {
 	Host      string
 	Port      string
 	Type      string
-	isRunning bool
+	IsRunning bool
 }
 
 type ServerOption func(*Options)
@@ -38,6 +39,7 @@ func UseType(type_ string) ServerOption {
 
 type Server struct {
 	Options
+	DTGPool  *pool.DTGPool
 	Listener *net.Listener
 }
 
@@ -53,13 +55,13 @@ func CreateServer(options ...ServerOption) *Server {
 		option(&opts)
 	}
 
-	s := &Server{opts, nil}
+	s := &Server{opts, pool.NewPool(), nil}
 	return s
 }
 
 // Start starts socket server
 func (s *Server) Start() {
-	s.isRunning = true
+	s.IsRunning = true
 
 	fmt.Printf("Starting %s server at %s%s\n", s.Type, s.Host, s.Port)
 	server, err := net.Listen(s.Type, s.Host+s.Port)
@@ -73,7 +75,7 @@ func (s *Server) Start() {
 	fmt.Printf("Server started at %s%s\n", s.Host, s.Port)
 
 	//listen to connections
-	for s.isRunning {
+	for s.IsRunning {
 		connection, err := server.Accept()
 		if err != nil {
 			fmt.Println("error accepting client: ", err.Error())
@@ -88,7 +90,7 @@ func (s *Server) Start() {
 
 func (s *Server) Stop() {
 	fmt.Println("Stopping server")
-	s.isRunning = false
+	s.IsRunning = false
 	(*s.Listener).Close()
 }
 
@@ -96,24 +98,28 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-func sendResponse(connection *net.Conn) func(v any) {
-	return func(v any) {
+func sendResponse(connection *net.Conn) func(v any) error {
+	return func(v any) error {
 		res, err := json.Marshal(v)
 		if err != nil {
 			response, _ := json.Marshal(ErrorResponse{"500 : failed encoding response"})
 			(*connection).Write(response)
+			return err
 		}
 
-		(*connection).Write(res)
+		n, err := (*connection).Write(res)
+		n++ //remove unused var error
+
+		return err
 	}
 }
 
 func (s *Server) process(connection net.Conn) {
-	conn := connection2.DTGConnection{Con: &connection, IsOpen: true}
+	conn := connection2.DTGConnection{Con: &connection, IsOpen: true, DTGPool: s.DTGPool}
 
 	// while connection persists wait for and handle event
 	for {
-		if !s.isRunning || !conn.IsOpen {
+		if !s.IsRunning || !conn.IsOpen {
 			conn.Close()
 			break
 		}
@@ -145,7 +151,7 @@ func (s *Server) process(connection net.Conn) {
 				conn.Close()
 			}
 
-			if evt.Event == "stop" {
+			if evt.Event == "shutdown" {
 				conn.Close()
 				s.Stop()
 			}

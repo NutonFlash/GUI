@@ -2,15 +2,17 @@ package connection
 
 import (
 	"GUI/simpledtg/src/dtg"
+	"GUI/simpledtg/src/dtg/pool"
 	"net"
 	"nhooyr.io/websocket"
 )
 
 type DTGConnection struct {
-	DTG    *dtg.DTG
-	Con    *net.Conn
-	WSCon  *websocket.Conn
-	IsOpen bool
+	DTG     *dtg.DTG
+	Con     *net.Conn
+	WSCon   *websocket.Conn
+	DTGPool *pool.DTGPool
+	IsOpen  bool
 }
 
 func (c *DTGConnection) Close() {
@@ -28,6 +30,7 @@ func (c *DTGConnection) Close() {
 	}
 
 	if c.DTG != nil {
+		c.DTGPool.Remove(c.DTG.ID)
 		c.DTG.End()
 	}
 }

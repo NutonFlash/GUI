@@ -27,18 +27,19 @@ Commands in the form of stringified JSON can be sent to the server to interact w
 
 ```
 {
-    "event": ${event},
-    "payload": ${payload}
+    "event": event,
+    "payload": payload
 }
 ```
 
-### `event`
+### `event` | `string`
 
--   `dtg` events directed to the DTG. `string`
+-   `dtg`: events directed to the DTG.
+-   `shutdown`: shuts down the server.
 
-### `payload`
+### `payload` | `Object`
 
-    payload is an object with instructions for the dtg
+    payload is an object containing instructions for the dtg
 
 ```
 {
@@ -47,40 +48,58 @@ Commands in the form of stringified JSON can be sent to the server to interact w
 }
 ```
 
-#### `action`
+#### `action` | `string`
 
     Actions specify which function to invoke with the specified parameters.
 
--   `init` initializes and runs the DTG, DTG data will begin to be streamed to the client.
--   `engine` turns the vehicle's engine on or off. `params("on": boolean)`
+-   `bind`: binds the connection to an existing DTG emulation (max 1 binds) `params("id": string)`
+
+    ```
+    {
+        "action": "bind",
+        "id": "a1b2c"
+    }
+    ```
+
+-   `init`: initializes and runs the DTG with the given latitudes and longitudes, DTG data will begin to be streamed to the client. `params("data": {"lat": float, "lng": float})`
+    ```
+    {
+        "action": "init",
+        "data": {
+             "lat": 36.339712,
+             "lng": 127.4445824,
+        }
+    }
+    ```
+-   `engine`: turns the vehicle's engine on or off. `params("on": boolean)`
     ```
     {
         "action": "engine",
         "on": true
     }
     ```
--   `accelerate` sets the acceleration rate of the vehicle. `params("accel": string("reverse", "none", "low", "medium", "high"))`
+-   `accelerate`: sets the acceleration rate of the vehicle. `params("accel": string("reverse", "none", "low", "medium", "high"))`
     ```
     {
         "action": "accelerate",
         "accel": "high"
     }
     ```
--   `brake` sets the braking rate of the vehicle, stops and resets when the speed of the vehicle is 0. `params("accel": string("low", "medium", "high"))`
+-   `brake`: sets the braking rate of the vehicle, stops and resets when the speed of the vehicle is 0. `params("brake": string("low", "medium", "high"))`
     ```
     {
         "action": "brake",
-        "accel": "high"
+        "brake": "high"
     }
     ```
--   `turn` instantly turns the vehicle by the specified degree with 2 decimal precision. `params("deg": uint16(0-359])`
+-   `turn`: instantly turns the vehicle by the specified degree with 2 decimal precision. `params("deg": uint16(0-359])`
     ```
     {
         "action": "turn",
         "deg": 90
     }
     ```
--   `end` ends the DTG session.
+-   `end`: ends the DTG session.
     ```
     {
         "action": "end"
@@ -93,39 +112,31 @@ The server periodically sends DTG data to the client once every 20 to 30 milisec
 
 ```
 DTG {
-    // latitudes and longitudes of the vehicle in decimal degrees multiplied by factor_latlng
+    "id": string, // id of the DTG for binding
+
     "latlng": {
         "lat": int64,
         "lng": int64,
         "factor_latlng": int32
-    },
+    }, // latitudes and longitudes of the vehicle in decimal degrees multiplied by factor_latlng
 
-    // speed of the vehicle in meters per second multiplied by factor_speed
-    "speed": int32,
+    "speed": int32, // speed of the vehicle in meters per second multiplied by factor_speed
 
-    // orientation of the vehicle in degrees multiplied by factor_deg
-    "orientation": uint16,
+    "orientation": uint16, // orientation of the vehicle in degrees multiplied by factor_deg
 
-    // acceleration of the vehicle in decimal degrees multiplied by factor_speed
-    "acceleration": int32,
+    "acceleration": int32, // acceleration of the vehicle in decimal degrees multiplied by factor_speed
 
-    // runtime is the total time elapsed since init with the engine on in milliseconds
-    "runtime": int64,
+    "runtime": int64, // runtime is the total time elapsed since init with the engine on in milliseconds
 
-    // distance travelled by the vehicle since init in decimal degrees multiplied by factor_latlng multiplied by factor_latlng
-    "distance": int64,
+    "distance": int64, // distance travelled by the vehicle since init in decimal degrees multiplied by factor_latlng multiplied by factor_latlng
 
-    // overspeed is the total distance travelled by the vehicle during speeds of over speedlimit in decimal degrees
-    "overspeed": int64,
+    "overspeed": int64, // overspeed is the total distance travelled by the vehicle during speeds of over speedlimit in decimal degrees
 
-    // idle_time is the total time elapsed while engine is on with 0 speed and acceleration in ,milliseconds
-    "idle_time": int64,
+    "idle_time": int64, // idle_time is the total time elapsed while engine is on with 0 speed and acceleration in ,milliseconds
 
-    // sudden_accel is the total amount of times that the vehicle had a high rate of acceleration
-    "sudden_accel": int16,
+    "sudden_accel": int16, // sudden_accel is the total amount of times that the vehicle had a high rate of acceleration
 
-    // sudden_brake is the total amount of times that the vehicle had a high rate of deceleration
-    "sudden_brake": int16,
+    "sudden_brake": int16, // sudden_brake is the total amount of times that the vehicle had a high rate of deceleration
 
     "vehicle_id": string, // unimplemented
 
@@ -138,3 +149,7 @@ DTG {
     "factor_speed": int,
 }
 ```
+
+## Termination
+
+The server can be shut down via the endpoint `localhost:{port}/shutdown` or via the event `shutdown`.

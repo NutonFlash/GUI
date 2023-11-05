@@ -5,9 +5,25 @@ import (
 	"GUI/simpledtg/src/server/connection"
 )
 
-func DTGHandler(payload *map[string]interface{}, conn *connection.DTGConnection, send func(v any)) {
+type HandlerResponse struct {
+	Message string `json:"message"`
+}
+
+func DTGHandler(payload *map[string]interface{}, conn *connection.DTGConnection, send func(v any) error) {
 	action := (*payload)["action"].(string)
 	switch action {
+
+	// TODO: add bind action to bind current connection to existing dtg
+	case "bind":
+		id := (*payload)["id"].(string)
+		if _dtg, ok := conn.DTGPool.Get(id); ok {
+			conn.DTG = _dtg
+			_dtg.BindRecv(send)
+		} else {
+			send(HandlerResponse{"Failed to bind to DTG, id not found"})
+		}
+
+		break
 	case "init":
 		data := (*payload)["data"].(map[string]interface{})
 
@@ -18,7 +34,12 @@ func DTGHandler(payload *map[string]interface{}, conn *connection.DTGConnection,
 			conn.DTG.End()
 		}
 
-		conn.DTG = dtg.CreateDTG(lat, lng, send)
+		conn.DTG = dtg.CreateDTG(lat, lng, send, func(id string) {
+			conn.DTGPool.Remove(id)
+		})
+
+		conn.DTGPool.Add(conn.DTG)
+
 		conn.DTG.Run()
 		break
 	case "engine":
@@ -30,7 +51,7 @@ func DTGHandler(payload *map[string]interface{}, conn *connection.DTGConnection,
 		conn.DTG.Accelerate(dtg.Accels[accel])
 		break
 	case "brake":
-		accel := (*payload)["accel"].(string)
+		accel := (*payload)["brake"].(string)
 		conn.DTG.Brake(dtg.Accels[accel])
 		break
 	case "turn":
