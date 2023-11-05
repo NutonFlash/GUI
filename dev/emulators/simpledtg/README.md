@@ -8,6 +8,7 @@ Simple DTG Emulation server over socket / websocket written in Go.
 
 ## Usage
 
+Download dependencies `go mod download`.
 Run `go run `.
 
 ### Flags
@@ -72,7 +73,7 @@ Commands in the form of stringified JSON can be sent to the server to interact w
         "accel": "high"
     }
     ```
--   `turn` instantly turns the vehicle by the specified degree with 2 decimal precision. `params("deg": float)`
+-   `turn` instantly turns the vehicle by the specified degree with 2 decimal precision. `params("deg": uint16(0-359])`
     ```
     {
         "action": "turn",
@@ -105,16 +106,16 @@ DTG {
     // orientation of the vehicle in degrees multiplied by factor_deg
     "orientation": uint16,
 
-    // acceleration of the vehicle in Decimal Degrees (DD) multiplied by factor_speed
+    // acceleration of the vehicle in decimal degrees multiplied by factor_speed
     "acceleration": int32,
 
     // runtime is the total time elapsed since init with the engine on in milliseconds
     "runtime": int64,
 
-    // distance travelled by the vehicle since Run() in Decimal Degrees (DD) multiplied by factor_latlng multiplied by factor_latlng
+    // distance travelled by the vehicle since init in decimal degrees multiplied by factor_latlng multiplied by factor_latlng
     "distance": int64,
 
-    // overspeed is the total distance travelled by the vehicle during speeds of over speedlimit in Decimal Degrees (DD)
+    // overspeed is the total distance travelled by the vehicle during speeds of over speedlimit in decimal degrees
     "overspeed": int64,
 
     // idle_time is the total time elapsed while engine is on with 0 speed and acceleration in ,milliseconds
@@ -133,7 +134,7 @@ DTG {
     "engine_running": bool,
 
     "factor_deg": int,
-    
+
     "factor_speed": int,
 }
 ```
