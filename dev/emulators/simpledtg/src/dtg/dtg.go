@@ -39,14 +39,14 @@ var Accels = map[string]Accel{"reverse": Accel_Reverse, "none": Accel_None, "low
 
 // DTG assumes that 1 DD is equal to 1 meter.
 type DTG struct {
-	LatLng        LatLng `json:"latlng"`       // LatLng is the position of the vehicle in Decimal Degrees (DD)
-	Speed         int32  `json:"speed"`        // Speed of the vehicle in Decimal Degrees (DD)
-	Orientation   uint16 `json:"orientation"`  // Orientation of the vehicle in Degrees
-	Acceleration  int32  `json:"acceleration"` // Acceleration of the vehicle in Decimal Degrees (DD)
-	RunTime       int64  `json:"runtime"`      // RunTime is the total time elapsed since Run() in Milliseconds
-	Distance      int64  `json:"distance"`     // Distance travelled by the vehicle since Run() in Decimal Degrees (DD)
-	OverSpeed     int64  `json:"overspeed"`    // OverSpeed is the total distance travelled by the vehicle during speeds of over SpeedLimit in Decimal Degrees (DD)
-	IdleTime      int64  `json:"idle_time"`    // IdleTime is the total time elapsed while engine is on and 0 vector and acceleration in Milliseconds
+	LatLng        LatLng `json:"latlng"`       // LatLng is the position of the vehicle in Decimal Degrees (DD) multiplied by factor_latlng
+	Speed         int32  `json:"speed"`        // Speed of the vehicle in meters per second multiplied by factor_speed
+	Orientation   uint16 `json:"orientation"`  // Orientation of the vehicle in degrees multiplied by factor_deg
+	Acceleration  int32  `json:"acceleration"` // Acceleration of the vehicle in meters per second squared, multiplied by factor_speed
+	RunTime       int64  `json:"runtime"`      // RunTime is the total time elapsed since Run() with the engine on in Milliseconds
+	Distance      int64  `json:"distance"`     // Distance travelled by the vehicle since Run() in Decimal Degrees (DD) multiplied by factor_latlng
+	OverSpeed     int64  `json:"overspeed"`    // OverSpeed is the total distance travelled by the vehicle during speeds of over SpeedLimit in Decimal Degrees (DD) multiplied by factor_speed
+	IdleTime      int64  `json:"idle_time"`    // IdleTime is the total time elapsed while engine is on and 0 speed and acceleration in Milliseconds
 	SuddenAccel   int16  `json:"sudden_accel"` // SuddenAccel is the total amount of times that the vehicle had a high rate of acceleration
 	SuddenBrake   int16  `json:"sudden_brake"` // SuddenBrake is the total amount of times that the vehicle had a high rate of deceleration
 	VehicleID     string `json:"vehicle_id"`
