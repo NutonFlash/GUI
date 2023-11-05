@@ -46,11 +46,11 @@ func DefaultOptions() Options {
 }
 
 // CreateServer creates a new socket server
-func CreateServer(options ...*ServerOption) *Server {
+func CreateServer(options ...ServerOption) *Server {
 	opts := DefaultOptions()
 
 	for _, option := range options {
-		(*option)(&opts)
+		option(&opts)
 	}
 
 	s := &Server{opts, nil}

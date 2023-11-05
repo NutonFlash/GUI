@@ -25,7 +25,7 @@ func (l *LatLng) String() (string, string) {
 	return fmt.Sprintf("%d.%d", l.Lat/FactorLatLng, l.Lat%FactorLatLng), fmt.Sprintf("%d.%d", l.Lng/FactorLatLng, l.Lng%FactorLatLng)
 }
 
-type Accel int8
+type Accel int32
 
 const (
 	Accel_Reverse Accel = -1
@@ -40,9 +40,9 @@ var Accels = map[string]Accel{"reverse": Accel_Reverse, "none": Accel_None, "low
 // DTG assumes that 1 DD is equal to 1 meter.
 type DTG struct {
 	LatLng        LatLng `json:"latlng"`       // LatLng is the position of the vehicle in Decimal Degrees (DD)
-	Speed         uint32 `json:"speed"`        // Speed of the vehicle in Decimal Degrees (DD)
+	Speed         int32  `json:"speed"`        // Speed of the vehicle in Decimal Degrees (DD)
 	Orientation   uint16 `json:"orientation"`  // Orientation of the vehicle in Degrees
-	Acceleration  int16  `json:"acceleration"` // Acceleration of the vehicle in Decimal Degrees (DD)
+	Acceleration  int32  `json:"acceleration"` // Acceleration of the vehicle in Decimal Degrees (DD)
 	RunTime       int64  `json:"runtime"`      // RunTime is the total time elapsed since Run() in Milliseconds
 	Distance      int64  `json:"distance"`     // Distance travelled by the vehicle since Run() in Decimal Degrees (DD)
 	OverSpeed     int64  `json:"overspeed"`    // OverSpeed is the total distance travelled by the vehicle during speeds of over SpeedLimit in Decimal Degrees (DD)
@@ -80,7 +80,7 @@ func (dtg *DTG) _Run() {
 				accel *= -1
 			}
 
-			dtg.Speed = uint32(max(min(int32(dtg.Speed)+(speedPerTick(int32(accel), elapsed)), MaxSpeed), 0))
+			dtg.Speed = max(min(dtg.Speed+speedPerTick(accel, elapsed), MaxSpeed), 0)
 		}
 
 		if dtg.Speed > 0 {
@@ -115,8 +115,8 @@ func (dtg *DTG) _Run() {
 			}
 
 			// calculate displacement vector
-			dLat := sLat * int64(float64(speedPerTick(int32(dtg.Speed), elapsed))*(getLatFunc(quadrant)(ToRad(theta))))
-			dLng := sLng * int64(float64(speedPerTick(int32(dtg.Speed), elapsed))*(getLngFunc(quadrant)(ToRad(theta))))
+			dLat := sLat * int64(float64(speedPerTick(dtg.Speed, elapsed))*(getLatFunc(quadrant)(ToRad(theta))))
+			dLng := sLng * int64(float64(speedPerTick(dtg.Speed, elapsed))*(getLngFunc(quadrant)(ToRad(theta))))
 
 			dtg.LatLng.Lat += dLat
 			dtg.LatLng.Lng += dLng
@@ -164,9 +164,9 @@ func (dtg *DTG) Accelerate(accel Accel) {
 	prevAcc := dtg.Acceleration
 
 	dtg.isBraking = false
-	dtg.Acceleration = int16(accel) * BaseAccel
+	dtg.Acceleration = int32(accel) * BaseAccel
 
-	if prevAcc != int16(accel-1)*BaseAccel {
+	if prevAcc != int32(accel-1)*BaseAccel {
 		dtg.SuddenAccel++
 	}
 }
@@ -175,15 +175,15 @@ func (dtg *DTG) Brake(accel Accel) {
 	prevAcc := dtg.Acceleration
 	wasBraking := dtg.isBraking
 
-	dtg.Acceleration = int16(accel) * BaseAccel
+	dtg.Acceleration = int32(accel) * BaseAccel
 	dtg.isBraking = true
 
 	if !wasBraking {
-		if dtg.Acceleration > int16(Accel_Low)*BaseAccel {
+		if dtg.Acceleration > int32(Accel_Low)*BaseAccel {
 			dtg.SuddenBrake++
 		}
 	} else {
-		if prevAcc != int16(accel-1)*BaseAccel {
+		if prevAcc != int32(accel-1)*BaseAccel {
 			dtg.SuddenBrake++
 		}
 	}

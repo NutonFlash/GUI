@@ -15,10 +15,10 @@ type WSServer struct {
 	srv     *http.Server
 }
 
-func CreateWSServer(options ...*ServerOption) *WSServer {
+func CreateWSServer(options ...ServerOption) *WSServer {
 	opts := DefaultOptions()
 	for _, option := range options {
-		(*option)(&opts)
+		option(&opts)
 	}
 
 	opts.Type = "wss"
