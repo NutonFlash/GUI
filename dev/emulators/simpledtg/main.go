@@ -2,17 +2,12 @@ package main
 
 import (
 	"GUI/simpledtg/src/server"
-	"fmt"
 	"time"
 )
 
 func main() {
-	s := server.CreateServer()
-	go s.Start()
-
+	wss := server.CreateWSServer()
 	time.Sleep(30 * time.Second)
-	fmt.Println("Force Closing")
-	s.Stop()
-
+	wss.Stop()
 	time.Sleep(1 * time.Second)
 }

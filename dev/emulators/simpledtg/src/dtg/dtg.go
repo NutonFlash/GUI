@@ -16,8 +16,9 @@ const (
 )
 
 type LatLng struct {
-	Lat int64 `json:"lat"`
-	Lng int64 `json:"lng"`
+	Lat          int64 `json:"lat"`
+	Lng          int64 `json:"lng"`
+	FactorLatLng int   `json:"factor_latlng"`
 }
 
 func (l *LatLng) String() (string, string) {
@@ -51,6 +52,8 @@ type DTG struct {
 	VehicleID     string `json:"vehicle_id"`
 	DriverID      string `json:"driver_id"`
 	EngineRunning bool   `json:"engine_running"`
+	FactorDeg     int    `json:"factor_deg"`
+	FactorSpeed   int    `json:"factor_speed"`
 	isBraking     bool
 	nextTick      time.Time
 	isRunning     bool
@@ -83,6 +86,7 @@ func (dtg *DTG) _Run() {
 		if dtg.Speed > 0 {
 			theta := dtg.Orientation
 
+			// signs per quadrant
 			SignsLng := [4]int64{-1, -1, 1, 1}
 			SignsLat := [4]int64{1, -1, -1, 1}
 
@@ -91,11 +95,13 @@ func (dtg *DTG) _Run() {
 
 			var quadrant int
 
+			// reverse signs if braking
 			if dtg.isBraking {
 				sLng = -1
 				sLat = -1
 			}
 
+			// determine quadrant and apply sign
 			for q, quad := range [4]uint16{270 * FactorDeg, 180 * FactorDeg, 90 * FactorDeg, 0 * FactorDeg} {
 				if theta >= quad {
 					theta -= quad
@@ -108,6 +114,7 @@ func (dtg *DTG) _Run() {
 				}
 			}
 
+			// calculate displacement vector
 			dLat := sLat * int64(float64(speedPerTick(int32(dtg.Speed), elapsed))*(getLatFunc(quadrant)(ToRad(theta))))
 			dLng := sLng * int64(float64(speedPerTick(int32(dtg.Speed), elapsed))*(getLngFunc(quadrant)(ToRad(theta))))
 
@@ -200,8 +207,8 @@ func (dtg *DTG) Engine(on bool) {
 }
 
 func CreateDTG(lat int64, lng int64, send func(v any)) *DTG {
-	dtg := DTG{}
-	dtg.LatLng = LatLng{lat, lng}
+	dtg := DTG{FactorDeg: FactorDeg, FactorSpeed: 1_000}
+	dtg.LatLng = LatLng{lat, lng, FactorLatLng}
 	dtg.send = send
 
 	return &dtg
