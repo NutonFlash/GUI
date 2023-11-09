@@ -3,6 +3,8 @@ package handler
 import (
 	"GUI/simpledtg/src/dtg"
 	"GUI/simpledtg/src/server/connection"
+	"fmt"
+	"strconv"
 )
 
 type HandlerResponse struct {
@@ -12,8 +14,6 @@ type HandlerResponse struct {
 func DTGHandler(payload *map[string]interface{}, conn *connection.DTGConnection, send func(v any) error) {
 	action := (*payload)["action"].(string)
 	switch action {
-
-	// TODO: add bind action to bind current connection to existing dtg
 	case "bind":
 		id := (*payload)["id"].(string)
 		if _dtg, ok := conn.DTGPool.Get(id); ok {
@@ -55,7 +55,12 @@ func DTGHandler(payload *map[string]interface{}, conn *connection.DTGConnection,
 		conn.DTG.Brake(dtg.Accels[accel])
 		break
 	case "turn":
-		deg := (*payload)["deg"].(float64) * dtg.FactorDeg
+		deg, err := strconv.Atoi((*payload)["deg"].(string))
+		if err != nil {
+			fmt.Println("Deg Type Mismatch:", err)
+			return
+		}
+		deg *= dtg.FactorDeg
 		conn.DTG.Turn(uint16(deg))
 	case "end":
 		conn.DTG.End()

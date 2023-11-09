@@ -128,7 +128,7 @@ DTG {
 
     "runtime": int64, // runtime is the total time elapsed since init with the engine on in milliseconds
 
-    "distance": int64, // distance travelled by the vehicle since init in decimal degrees multiplied by factor_latlng multiplied by factor_latlng
+    "distance": int64, // distance travelled by the vehicle since init in decimal degrees multiplied by factor_latlng
 
     "overspeed": int64, // overspeed is the total distance travelled by the vehicle during speeds of over speedlimit in decimal degrees multiplied by factor_latlng
 

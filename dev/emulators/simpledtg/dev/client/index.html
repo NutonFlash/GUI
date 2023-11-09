@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTG Interface</title>
+    <script src="./lib/DTG.js"></script>
+    <script src="./index.js"></script>
+    <link rel="stylesheet" href="./index.css">
+</head>
+
+<body>
+    <div><label>Status: </label> <span id="connected">Not Connected</span> <button id="connect">Connect</button></div>
+    <div>
+        <h1>Engine</h1>
+        <button id="engine_on">On</button>
+        <button id="engine_off">Off</button>
+    </div>
+    <div>
+        <h1>Steer</h1>
+        <input type="number" min="0" max="359" id="steer_input">deg
+        <button id="steer_btn">Turn</button>
+    </div>
+    <div>
+        <h1>Acceleration</h1>
+        <button id="accel_rev">Reverse</button>
+        <button id="accel_none">None</button>
+        <button id="accel_low">Low</button>
+        <button id="accel_med">Medium</button>
+        <button id="accel_high">High</button>
+    </div>
+    <div>
+        <h1>Brake</h1>
+        <button id="brake_low">Low</button>
+        <button id="brake_med">Medium</button>
+        <button id="brake_high">High</button>
+    </div>
+    <div>
+        <h1>Data</h1>
+        <div>
+            <pre><code id="display"></code></pre>
+        </div>
+    </div>
+</body>
+
+</html>

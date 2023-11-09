@@ -7,11 +7,19 @@
     <title>Main Page</title>
     <script type="text/javascript"
         src="http://dapi.kakao.com/v2/maps/sdk.js?appkey=3137a59c7a30af330760cfac110fa73e"></script>
+    <script src="./lib/DTG.js"></script>
     <script src="./index.js"></script>
     <link rel="stylesheet" href="./index.css">
 </head>
 
 <body style="overflow: hidden; margin: 0; padding: 0;">
+    <div id="alert-container">
+        <div id="alert">
+            <h1 id="alert-title"></h1>
+            <h2 id="alert-content"></h2>
+            <button id="alert-close" onclick="hideAlert()">Close</button>
+        </div>
+    </div>
     <div id="map">MAP_NOT_LOADED
     </div>
     <div id="sidebar">
@@ -27,8 +35,13 @@
             <div class="top-bar">실시간 현황</div>
             <div class="car-info">
                 <div id="car-detail">배차 2023-0718-001 첨단1, 2 구역</div>
-                <button id="dropdown-misc"><img src="../../assets/chevron-left-black.svg" width="20px"
-                        style="rotate: 270deg;"></button>
+                <label id="dropdown-misc"><img src="../../assets/chevron-left-black.svg" width="20px"
+                        style="rotate: 270deg;"><input type="checkbox" class="visually-hidden"></label>
+                <div id="dropdown">
+                    <ul>
+                        <li><input type="text" id="dtg-id"><button id="bind-dtg">Bind DTG</button></li>
+                    </ul>
+                </div>
             </div>
             <div class="eco-rating-container">
                 <img class="eco-img" src="../../assets/eco.svg">

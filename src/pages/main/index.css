@@ -139,6 +139,11 @@
     border-bottom-right-radius: 7px;
 
     cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
 }
 
 .eco-rating-container {
@@ -359,14 +364,13 @@
 }
 
 .vehicle-speed-container {
-    width: 10rem;
+    width: 11rem;
     height: 8rem;
 
     margin-top: 1rem;
 
-    padding-top: 1rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 1rem;
+    padding-bottom: 0;
 
     border-radius: 5px;
 
@@ -376,8 +380,6 @@
 
 .vehicle-speed {
     color: rgb(83, 138, 232);
-
-    margin-bottom: 1rem;
 }
 
 .vehicle-speed #vehicle-speed {
@@ -442,4 +444,67 @@
 
 .right-overlay-bottom > a > img {
     width: 50%;
+}
+
+#dropdown {
+    display: none;
+
+    transform: translate(20%, 50%);
+}
+
+#dropdown > ul {
+    list-style-type: none;
+}
+
+#dropdown-misc:has(input:checked) ~ #dropdown {
+    display: block;
+    position: absolute;
+}
+
+#alert-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+
+    z-index: 999;
+}
+
+#alert {
+    min-width: 350px;
+    max-width: 450px;
+    min-height: 50px;
+    max-height: 300px;
+
+    overflow-y: auto;
+
+    border: 2px solid black;
+    border-radius: 5px;
+
+    background-color: rgb(238, 238, 238);
+
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+}
+
+#alert-title {
+    flex-grow: 1;
+}
+
+#alert-content {
+    flex-grow: 3;
+}
+
+#alert-close {
+    flex-grow: 1;
+}
+
+#alert-close {
+    bottom: 0;
+    cursor: pointer;
+    height: 2rem;
 }

@@ -191,7 +191,7 @@ func (_dtg *DTG) Accelerate(accel Accel) {
 	_dtg.isBraking = false
 	_dtg.Acceleration = toAcceleration(accel)
 
-	if prevAcc != toAcceleration(accel-1) {
+	if prevAcc != toAcceleration(accel-1) && prevAcc != toAcceleration(accel+1) {
 		_dtg.SuddenAccel++
 	}
 }
@@ -208,7 +208,8 @@ func (_dtg *DTG) Brake(accel Accel) {
 			_dtg.SuddenBrake++
 		}
 	} else {
-		if prevAcc > _dtg.Acceleration && prevAcc != toBrakeAcceleration(accel-1) {
+		//if prevAcc > _dtg.Acceleration && prevAcc != toBrakeAcceleration(accel-1) {
+		if prevAcc != toBrakeAcceleration(accel+1) && prevAcc != toBrakeAcceleration(accel-1) {
 			_dtg.SuddenBrake++
 		}
 	}
@@ -273,6 +274,7 @@ func speedPerTick(speed int32, elapsed time.Duration) int32 {
 }
 
 func toBrakeAcceleration(accel Accel) int32 {
+	// 6 is a good braking factor
 	return toAcceleration(accel) * 6
 }
 
