@@ -1,4 +1,9 @@
+import { createSidebar } from "../../components/sidebar.js";
+
 window.onload = () => {
+
+    createSidebar(document.getElementById('sidebar'), '../../assets/sidebar/');
+
     document.getElementById('backBtn').onclick = () => {
         let t = document.createElement('a');
         t.href = '../login/index.html';
