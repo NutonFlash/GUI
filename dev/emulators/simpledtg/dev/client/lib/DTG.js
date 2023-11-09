@@ -67,7 +67,10 @@ class DTG {
     }
 
     connect() {
-        this.socket = new WebSocket('ws://localhost:3999/dtg');
+        let io = window.location.hostname;
+        this.socket = new WebSocket(
+            `ws://${window.location.hostname}:3999/dtg`,
+        );
 
         this.socket.addEventListener('open', () => {
             this.connected = true;

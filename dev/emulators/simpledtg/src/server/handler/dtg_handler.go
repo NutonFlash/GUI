@@ -61,7 +61,7 @@ func DTGHandler(payload *map[string]interface{}, conn *connection.DTGConnection,
 			return
 		}
 		deg *= dtg.FactorDeg
-		conn.DTG.Turn(uint16(deg))
+		conn.DTG.Turn(int16(deg))
 	case "end":
 		conn.DTG.End()
 	}

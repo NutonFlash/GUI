@@ -33,6 +33,15 @@ const inputs = {
             steerHandler(document.getElementById(inputs.steerDeg.id).value);
         },
     },
+    steerBtn2: {
+        id: 'steer_btn2',
+        event: 'onclick',
+        handler: () => {
+            steerHandler(
+                document.getElementById(inputs.steerDeg.id).value * -1,
+            );
+        },
+    },
     accelRev: {
         id: 'accel_rev',
         event: 'onclick',
