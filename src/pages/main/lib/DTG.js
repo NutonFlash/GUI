@@ -88,8 +88,6 @@ class DTG {
         this.socket.addEventListener('message', (evt) => {
             this.data = JSON.parse(evt.data);
             displayFunc(this.data);
-
-            console.log(this.data);
         });
 
         this.socket.addEventListener('close', () => {
@@ -125,6 +123,7 @@ class DTG {
         });
 
         this.socket.addEventListener('close', () => {
+            this.data = { message: 'Disconnected' };
             console.log('socket closed');
         });
     }

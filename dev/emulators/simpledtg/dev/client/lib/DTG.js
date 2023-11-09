@@ -48,7 +48,7 @@ class DTG {
                 event: 'dtg',
                 payload: {
                     action: 'turn',
-                    deg: deg,
+                    deg: deg + '',
                 },
             }),
         );

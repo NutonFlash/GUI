@@ -41,11 +41,12 @@ window.onload = () => {
 function displayDTGData(data) {
     if ('message' in data) {
         console.log(data);
-        showAlert('DTG Error', 'Check Console');
+        showAlert('DTG Error', data.message);
     }
 
     let latlng = convLatLng(data.latlng);
     let speed = convSpeed(data.speed, data.factor_speed);
+    let accel = convSpeed(data.acceleration, data.factor_speed);
     let runtime = toTime(data.runtime);
     let distance = toDistance(data.distance, data.latlng.factor_latlng);
     let overspeed = toDistance(data.overspeed, data.latlng.factor_latlng);
@@ -64,6 +65,9 @@ function displayDTGData(data) {
 
     document.getElementById('vehicle-speed').innerText = speed;
 
+    document.getElementById('vehicle-rpm').innerText =
+        (data.engine_running ? 1000 : 0) + convRpm(speed) + convRpm(accel);
+
     let kakaoLL = new kakao.maps.LatLng(latlng.lat, latlng.lng);
 
     carPos.setPosition(kakaoLL);
@@ -78,11 +82,16 @@ function convLatLng(latlng) {
 }
 
 function convSpeed(speed, factor) {
-    return (speed / factor).toFixed(1);
+    return ((speed * 3.6) / factor).toFixed(1);
 }
 
 function convDeg(deg, factor) {
     return (deg / factor).toFixed(1);
+}
+
+function convRpm(speed) {
+    let kmh = speed / 3.6;
+    return Math.floor((kmh * 60) / 3);
 }
 
 function toTime(ms) {

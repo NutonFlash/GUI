@@ -92,11 +92,11 @@ Commands in the form of stringified JSON can be sent to the server to interact w
         "brake": "high"
     }
     ```
--   `turn`: instantly turns the vehicle by the specified degree with 2 decimal precision. `params("deg": int16(-180, 180])`
+-   `turn`: instantly turns the vehicle by the specified degree with 2 decimal precision. `params("deg": string(int16(-180, 180]))`
     ```
     {
         "action": "turn",
-        "deg": 90
+        "deg": "90"
     }
     ```
 -   `end`: ends the DTG session.
