@@ -21,6 +21,10 @@ type LatLng struct {
 	FactorLatLng int   `json:"factor_latlng"`
 }
 
+type DTGResponse struct {
+	Message string `json:"message"`
+}
+
 func (l *LatLng) String() (string, string) {
 	return fmt.Sprintf("%d.%d", l.Lat/FactorLatLng, l.Lat%FactorLatLng), fmt.Sprintf("%d.%d", l.Lng/FactorLatLng, l.Lng%FactorLatLng)
 }
@@ -178,6 +182,15 @@ func (_dtg *DTG) Run() {
 
 func (_dtg *DTG) End() {
 	_dtg.isRunning = false
+
+	go func() {
+		for _, send := range _dtg.sends {
+			if send != nil {
+				send(DTGResponse{"DTG Ended"})
+			}
+		}
+	}()
+
 	fmt.Println("Stopping DTG")
 }
 
