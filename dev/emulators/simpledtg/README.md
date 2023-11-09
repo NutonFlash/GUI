@@ -43,7 +43,7 @@ Commands in the form of stringified JSON can be sent to the server to interact w
 
 ```
 {
-    "action": ${action},
+    "action": action,
     ...
 }
 ```
@@ -92,7 +92,7 @@ Commands in the form of stringified JSON can be sent to the server to interact w
         "brake": "high"
     }
     ```
--   `turn`: instantly turns the vehicle by the specified degree with 2 decimal precision. `params("deg": uint16(0-359])`
+-   `turn`: instantly turns the vehicle by the specified degree with 2 decimal precision. `params("deg": int16(-180, 180])`
     ```
     {
         "action": "turn",
@@ -128,11 +128,11 @@ DTG {
 
     "runtime": int64, // runtime is the total time elapsed since init with the engine on in milliseconds
 
-    "distance": int64, // distance travelled by the vehicle since init in decimal degrees multiplied by factor_latlng multiplied by factor_latlng
+    "distance": int64, // distance travelled by the vehicle since init in decimal degrees multiplied by factor_latlng
 
-    "overspeed": int64, // overspeed is the total distance travelled by the vehicle during speeds of over speedlimit in decimal degrees
+    "overspeed": int64, // overspeed is the total distance travelled by the vehicle during speeds of over speedlimit in decimal degrees multiplied by factor_latlng
 
-    "idle_time": int64, // idle_time is the total time elapsed while engine is on with 0 speed and acceleration in ,milliseconds
+    "idle_time": int64, // idle_time is the total time elapsed while engine is on with 0 speed and acceleration in milliseconds
 
     "sudden_accel": int16, // sudden_accel is the total amount of times that the vehicle had a high rate of acceleration
 

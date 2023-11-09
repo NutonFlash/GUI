@@ -49,7 +49,7 @@ func (wss *WSServer) HandleShutdown() http.HandlerFunc {
 func (wss *WSServer) HandeConnectDTG() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Connection Request")
-		c, err := websocket.Accept(w, r, &websocket.AcceptOptions{OriginPatterns: []string{"localhost:5500"}})
+		c, err := websocket.Accept(w, r, &websocket.AcceptOptions{OriginPatterns: []string{"*"}})
 		if err != nil {
 			fmt.Println(err)
 			return

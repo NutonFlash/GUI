@@ -97,8 +97,8 @@ func (_dtg *DTG) _Run() {
 
 			var quadrant int
 
-			// reverse signs if braking
-			if _dtg.isBraking {
+			// reverse signs if reverse
+			if _dtg.Acceleration < 0 {
 				sLng = -1
 				sLat = -1
 			}
@@ -191,7 +191,7 @@ func (_dtg *DTG) Accelerate(accel Accel) {
 	_dtg.isBraking = false
 	_dtg.Acceleration = toAcceleration(accel)
 
-	if prevAcc != toAcceleration(accel-1) {
+	if prevAcc != toAcceleration(accel-1) && prevAcc != toAcceleration(accel+1) {
 		_dtg.SuddenAccel++
 	}
 }
@@ -208,15 +208,21 @@ func (_dtg *DTG) Brake(accel Accel) {
 			_dtg.SuddenBrake++
 		}
 	} else {
-		if prevAcc > _dtg.Acceleration && prevAcc != toBrakeAcceleration(accel-1) {
+		//if prevAcc > _dtg.Acceleration && prevAcc != toBrakeAcceleration(accel-1) {
+		if prevAcc != toBrakeAcceleration(accel+1) && prevAcc != toBrakeAcceleration(accel-1) {
 			_dtg.SuddenBrake++
 		}
 	}
 }
 
-// Turn degree has 2 decimal precision
-func (_dtg *DTG) Turn(deg uint16) {
-	_dtg.Orientation = (_dtg.Orientation + deg) % (360 * FactorDeg)
+// Turn degree has 2 decimal precision *in theory
+func (_dtg *DTG) Turn(deg int16) {
+	_deg := int32(_dtg.Orientation) + int32(deg)
+	for _deg < 0 {
+		_deg += 360 * int32(FactorDeg)
+	}
+
+	_dtg.Orientation = uint16(_deg % (360 * FactorDeg))
 }
 
 func (_dtg *DTG) Engine(on bool) {
@@ -254,14 +260,14 @@ func ToDeg(rad float64) uint16 {
 }
 
 func ToRad(deg uint16) float64 {
-	return float64(deg) * 314 / (180 * FactorDeg)
+	return float64(deg) * 3.14 / (180 * FactorDeg)
 }
 
 func getLngFunc(quadrant int) func(f float64) float64 {
 	if quadrant%2 == 0 {
-		return math.Sin
+		return math.Cos
 	}
-	return math.Cos
+	return math.Sin
 }
 
 func getLatFunc(quadrant int) func(f float64) float64 {
@@ -273,6 +279,7 @@ func speedPerTick(speed int32, elapsed time.Duration) int32 {
 }
 
 func toBrakeAcceleration(accel Accel) int32 {
+	// 6 is a good braking factor
 	return toAcceleration(accel) * 6
 }
 
