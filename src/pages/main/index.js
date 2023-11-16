@@ -17,18 +17,11 @@ window.onload = () => {
         level: 3, //지도의 레벨(확대, 축소 정도)
     };
 
-    navigator.geolocation.getCurrentPosition((pos) => {
-        console.log(pos.coords);
-        options.center = new kakao.maps.LatLng(
-            pos.coords.latitude,
-            pos.coords.longitude,
-        );
-        map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
-
-        carPos = new kakao.maps.Marker({
-            map: map,
-            position: options.center,
-        });
+    options.center = new kakao.maps.LatLng(36.339712, 127.4445824);
+    map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+    carPos = new kakao.maps.Marker({
+        map: map,
+        position: options.center,
     });
 
     document.getElementById('bind-dtg').onclick = () => {
