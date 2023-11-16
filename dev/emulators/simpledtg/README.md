@@ -8,8 +8,9 @@ Simple DTG Emulation server over socket / websocket written in Go.
 
 ## Usage
 
-Download dependencies `go mod download`.
-Run `go run `.
+-   Download dependencies `go mod download`
+
+-   Run `go run .`
 
 ### Flags
 
@@ -153,3 +154,7 @@ DTG {
 ## Termination
 
 The server can be shut down via the endpoint `localhost:{port}/shutdown` or via the event `shutdown`.
+
+# Basic Client
+
+A client with basic capabilities to interface with the DTG emulator has been provided at `./dev/client`, it is recommended to host the files as a webpage locally to avoid errors. See [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer).

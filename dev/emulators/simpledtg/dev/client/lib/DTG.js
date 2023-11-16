@@ -74,22 +74,22 @@ class DTG {
 
         this.socket.addEventListener('open', () => {
             this.connected = true;
-            console.log('DTG Connected');
+            console.log('Connected to server');
 
-            setTimeout(() => {
+            navigator.geolocation.getCurrentPosition((pos) => {
                 this.socket.send(
                     JSON.stringify({
                         event: 'dtg',
                         payload: {
                             action: 'init',
                             data: {
-                                lat: 36.339712,
-                                lng: 127.4445824,
+                                lat: pos.coords.latitude,
+                                lng: pos.coords.longitude,
                             },
                         },
                     }),
                 );
-            }, 100);
+            });
         });
 
         this.socket.addEventListener('message', (evt) => {
