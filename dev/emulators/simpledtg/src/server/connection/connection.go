@@ -13,6 +13,7 @@ type DTGConnection struct {
 	WSCon   *websocket.Conn
 	DTGPool *pool.DTGPool
 	IsOpen  bool
+	IsBind  bool
 }
 
 func (c *DTGConnection) Close() {
@@ -29,7 +30,7 @@ func (c *DTGConnection) Close() {
 		c.WSCon.Close(websocket.StatusNormalClosure, "")
 	}
 
-	if c.DTG != nil {
+	if c.DTG != nil && !c.IsBind {
 		c.DTGPool.Remove(c.DTG.ID)
 		c.DTG.End()
 	}
