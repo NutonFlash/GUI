@@ -1,18 +1,54 @@
-let dtg, carPos, map;
+let dtg, map, _kakaoLL;
 
-function createUserMarker(map, kakaoLL) {
-    var circle = new kakao.maps.Circle({
-        center: kakaoLL, // 원의 중심좌표 입니다
-        radius: 5, // 미터 단위의 원의 반지름입니다
+let userMarker = null;
+
+let lockView = true;
+
+function degToRad(deg) {
+    return (deg * Math.PI) / 180;
+}
+function rotate(x, y, theta) {
+    return {
+        x: x * Math.cos(degToRad(theta)) - y * Math.sin(degToRad(theta)),
+        y: x * Math.sin(degToRad(theta)) + y * Math.cos(degToRad(theta)),
+    };
+}
+
+function createUserMarker(map, lat, lng, orientation = 0) {
+    if (userMarker != null) {
+        userMarker.circle.setMap(null);
+        userMarker.pointer.setMap(null);
+    } else {
+        userMarker = { circle: null, pointer: null };
+    }
+
+    let rad = 1.5;
+    userMarker.circle = new kakao.maps.Circle({
+        center: new kakao.maps.LatLng(lat, lng), // 원의 중심좌표 입니다
+        radius: rad, // 미터 단위의 원의 반지름입니다
         strokeWeight: 5, // 선의 두께입니다
-        strokeColor: '#75B8FA', // 선의 색깔입니다
+        strokeColor: '#7777FF', // 선의 색깔입니다
         strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
         strokeStyle: 'solid', // 선의 스타일 입니다
-        fillColor: '#CFE7FF', // 채우기 색깔입니다
-        fillOpacity: 0.7, // 채우기 불투명도 입니다
+        fillColor: '#7777FF', // 채우기 색깔입니다
+        fillOpacity: 1, // 채우기 불투명도 입니다
     });
 
-    circle.setMap(map);
+    let d = rotate(0, -0.000015, orientation);
+
+    userMarker.pointer = new kakao.maps.Circle({
+        center: new kakao.maps.LatLng(lat - d.y, lng + d.x), // 원의 중심좌표 입니다
+        radius: 0.8, // 미터 단위의 원의 반지름입니다
+        strokeWeight: 5, // 선의 두께입니다
+        strokeColor: '#7777FF', // 선의 색깔입니다
+        strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+        strokeStyle: 'solid', // 선의 스타일 입니다
+        fillColor: '#7777FF', // 채우기 색깔입니다
+        fillOpacity: 1, // 채우기 불투명도 입니다
+    });
+
+    userMarker.circle.setMap(map);
+    userMarker.pointer.setMap(map);
 }
 
 window.onload = () => {
@@ -25,6 +61,12 @@ window.onload = () => {
         t.click();
     };
 
+    document.getElementById('location-lock').onclick = () => {
+        lockView = true;
+
+        map.setCenter(_kakaoLL);
+    };
+
     var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
     var options = {
         //지도를 생성할 때 필요한 기본 옵션
@@ -32,19 +74,27 @@ window.onload = () => {
         level: 3, //지도의 레벨(확대, 축소 정도)
     };
 
-    options.center = new kakao.maps.LatLng(36.3401454, 127.4468659);
+    let lat = 36.3401454;
+    let lng = 127.4468659;
+    options.center = new kakao.maps.LatLng(lat, lng);
+
+    _kakaoLL = options.center;
+
     map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
-    carPos = new kakao.maps.Marker({
-        map: map,
-        position: options.center,
-    });
-    createUserMarker(map, options.center);
+
+    createUserMarker(map, lat, lng);
 
     document.getElementById('bind-dtg').onclick = () => {
         let id = document.getElementById('dtg-id').value;
 
         dtg.bind(id, displayDTGData);
     };
+
+    kakao.maps.event.addListener(map, 'dragstart', function () {
+        lockView = false;
+
+        map.setCenter();
+    });
 };
 
 function displayDTGData(data) {
@@ -62,6 +112,9 @@ function displayDTGData(data) {
     let idle = toTime(data.idle_time);
     let suddenbrake = data.sudden_brake;
     let suddenaccel = data.sudden_accel;
+    let orientation = data.orientation / data.factor_deg;
+
+    pos = latlng;
 
     document.getElementById('runtime-min').innerText = runtime.min;
     document.getElementById('runtime-sec').innerText = runtime.sec;
@@ -79,8 +132,11 @@ function displayDTGData(data) {
 
     let kakaoLL = new kakao.maps.LatLng(latlng.lat, latlng.lng);
 
-    carPos.setPosition(kakaoLL);
-    map.setCenter(kakaoLL);
+    createUserMarker(map, latlng.lat, latlng.lng, orientation);
+
+    _kakaoLL = kakaoLL;
+
+    if (lockView) map.setCenter(kakaoLL);
 }
 
 function convLatLng(latlng) {
