@@ -19,6 +19,7 @@ func DTGHandler(payload *map[string]interface{}, conn *connection.DTGConnection,
 		if _dtg, ok := conn.DTGPool.Get(id); ok {
 			conn.DTG = _dtg
 			_dtg.BindRecv(send)
+			conn.IsBind = true
 		} else {
 			send(HandlerResponse{"Failed to bind to DTG, id not found"})
 		}

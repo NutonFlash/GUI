@@ -1,5 +1,20 @@
 let dtg, carPos, map;
 
+function createUserMarker(map, kakaoLL) {
+    var circle = new kakao.maps.Circle({
+        center: kakaoLL, // 원의 중심좌표 입니다
+        radius: 5, // 미터 단위의 원의 반지름입니다
+        strokeWeight: 5, // 선의 두께입니다
+        strokeColor: '#75B8FA', // 선의 색깔입니다
+        strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+        strokeStyle: 'solid', // 선의 스타일 입니다
+        fillColor: '#CFE7FF', // 채우기 색깔입니다
+        fillOpacity: 0.7, // 채우기 불투명도 입니다
+    });
+
+    circle.setMap(map);
+}
+
 window.onload = () => {
     hideAlert();
     dtg = new DTG();
@@ -17,12 +32,13 @@ window.onload = () => {
         level: 3, //지도의 레벨(확대, 축소 정도)
     };
 
-    options.center = new kakao.maps.LatLng(36.339712, 127.4445824);
+    options.center = new kakao.maps.LatLng(36.3401454, 127.4468659);
     map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
     carPos = new kakao.maps.Marker({
         map: map,
         position: options.center,
     });
+    createUserMarker(map, options.center);
 
     document.getElementById('bind-dtg').onclick = () => {
         let id = document.getElementById('dtg-id').value;
