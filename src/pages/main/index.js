@@ -4,6 +4,26 @@ let userMarker = null;
 
 let lockView = true;
 
+async function getLatLngFromKeyword(keyword) {
+    let endpoint = `https://dapi.kakao.com/v2/local/search/keyword.json?query=${keyword}`;
+    let res = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+            Authorization: 'KakaoAK 032038e1b0b7aae5472e7395fdb9d40b',
+        },
+    });
+
+    res = await res.json();
+
+    let docs = res.documents;
+    if (docs.length <= 0) {
+        showAlert('Location not found');
+        return null;
+    }
+
+    return { lat: docs[0].y, lng: docs[0].x };
+}
+
 function degToRad(deg) {
     return (deg * Math.PI) / 180;
 }
@@ -51,7 +71,9 @@ function createUserMarker(map, lat, lng, orientation = 0) {
     userMarker.pointer.setMap(map);
 }
 
-window.onload = () => {
+window.onload = async () => {
+    console.log(await getLatLngFromKeyword('맘스터치 우송대점'));
+
     hideAlert();
     dtg = new DTG();
 
@@ -113,6 +135,8 @@ function displayDTGData(data) {
     let suddenbrake = data.sudden_brake;
     let suddenaccel = data.sudden_accel;
     let orientation = data.orientation / data.factor_deg;
+    let rpm =
+        (data.engine_running ? 1000 : 0) + convRpm(speed) + convRpm(accel);
 
     pos = latlng;
 
@@ -127,8 +151,7 @@ function displayDTGData(data) {
 
     document.getElementById('vehicle-speed').innerText = speed;
 
-    document.getElementById('vehicle-rpm').innerText =
-        (data.engine_running ? 1000 : 0) + convRpm(speed) + convRpm(accel);
+    document.getElementById('vehicle-rpm').innerText = rpm;
 
     let kakaoLL = new kakao.maps.LatLng(latlng.lat, latlng.lng);
 
