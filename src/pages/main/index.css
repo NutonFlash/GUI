@@ -363,6 +363,9 @@
 
     width: 20rem;
     right: 0;
+
+    z-index: 99;
+    pointer-events: none;
 }
 
 .vehicle-speed-container {
@@ -378,6 +381,8 @@
 
     background-color: rgba(255, 255, 255, 0.75);
     border: 1px solid lightgreen;
+
+    pointer-events: auto;
 }
 
 .vehicle-speed {
@@ -409,7 +414,6 @@
 
 .right-overlay > div {
     height: 49vh;
-    z-index: 99;
 }
 
 .right-overlay-bottom {
@@ -433,6 +437,8 @@
     flex-direction: column;
 
     margin-bottom: 1rem;
+
+    pointer-events: auto;
 }
 
 .right-overlay-bottom > a:first-child {
@@ -516,6 +522,7 @@
     margin-top: 1rem;
     display: flex;
     justify-content: flex-end;
+    pointer-events: auto;
 }
 
 #location-lock {

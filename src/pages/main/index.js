@@ -1,8 +1,70 @@
-let dtg, map, _kakaoLL;
+let dtg, map, _kakaoLL, LL;
 
 let userMarker = null;
 
 let lockView = true;
+
+let oldDirectionPaths = [];
+
+async function drawDirectionPaths(to, from = LL) {
+    for (let op of oldDirectionPaths) op.setMap(null);
+
+    oldDirectionPaths = [];
+
+    let waypoints = await getDirectionFromLatLng(
+        await getLatLngFromKeyword(to),
+    );
+
+    let path = new kakao.maps.Polyline({
+        map: map,
+        strokeWeight: 5,
+        strokeColor: '#2222FF',
+        strokeOpacity: 0.9,
+        strokeStyle: 'solid',
+    });
+
+    let paths = [];
+
+    for (let wp of waypoints) {
+        let count = 0;
+
+        let _LL = { lat: -1, lng: -1 };
+        for (let vert of wp.vertexes) {
+            if (count === 0) {
+                _LL.lng = vert;
+                count = 1;
+            } else {
+                _LL.lat = vert;
+                count = 0;
+
+                paths.push(new kakao.maps.LatLng(_LL.lat, _LL.lng));
+            }
+        }
+    }
+
+    path.setPath(paths);
+    oldDirectionPaths.push(path);
+}
+
+async function getDirectionFromLatLng(to, from = LL) {
+    let endpoint = `https://apis-navi.kakaomobility.com/v1/directions?origin=${from.lng},${from.lat}&destination=${to.lng},${to.lat}`;
+    let res = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+            Authorization: 'KakaoAK 032038e1b0b7aae5472e7395fdb9d40b',
+        },
+    });
+
+    res = await res.json();
+    res = res?.routes[0]?.sections[0].roads;
+    if (!res) {
+        showAlert(
+            `Direction to ${to.lat}, ${to.lng} from ${from.lat},${from.lng} not found`,
+        );
+    }
+
+    return res;
+}
 
 async function getLatLngFromKeyword(keyword) {
     let endpoint = `https://dapi.kakao.com/v2/local/search/keyword.json?query=${keyword}`;
@@ -17,7 +79,7 @@ async function getLatLngFromKeyword(keyword) {
 
     let docs = res.documents;
     if (docs.length <= 0) {
-        showAlert('Location not found');
+        showAlert(`Location ${keyword} not found`);
         return null;
     }
 
@@ -60,20 +122,19 @@ function createUserMarker(map, lat, lng, orientation = 0) {
         center: new kakao.maps.LatLng(lat - d.y, lng + d.x), // 원의 중심좌표 입니다
         radius: 0.8, // 미터 단위의 원의 반지름입니다
         strokeWeight: 5, // 선의 두께입니다
-        strokeColor: '#7777FF', // 선의 색깔입니다
+        strokeColor: '#5555FF', // 선의 색깔입니다
         strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
         strokeStyle: 'solid', // 선의 스타일 입니다
-        fillColor: '#7777FF', // 채우기 색깔입니다
+        // strokeDasharray: '5',
+        fillColor: '#5555FF', // 채우기 색깔입니다
         fillOpacity: 1, // 채우기 불투명도 입니다
     });
 
-    userMarker.circle.setMap(map);
     userMarker.pointer.setMap(map);
+    userMarker.circle.setMap(map);
 }
 
 window.onload = async () => {
-    // console.log(await getLatLngFromKeyword('맘스터치 우송대점'));
-
     hideAlert();
     dtg = new DTG();
 
@@ -100,6 +161,7 @@ window.onload = async () => {
     let lng = 127.4468659;
     options.center = new kakao.maps.LatLng(lat, lng);
 
+    LL = { lat: lat, lng: lng };
     _kakaoLL = options.center;
 
     map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
@@ -117,6 +179,12 @@ window.onload = async () => {
 
         map.setCenter();
     });
+
+    drawDirectionPaths('맘스터치 우송대점');
+
+    setInterval(() => {
+        drawDirectionPaths('맘스터치 우송대점');
+    }, 5000);
 };
 
 function displayDTGData(data) {
@@ -154,6 +222,8 @@ function displayDTGData(data) {
     document.getElementById('vehicle-rpm').innerText = rpm;
 
     let kakaoLL = new kakao.maps.LatLng(latlng.lat, latlng.lng);
+    LL.lat = latlng.lat;
+    LL.lng = latlng.lng;
 
     createUserMarker(map, latlng.lat, latlng.lng, orientation);
 
