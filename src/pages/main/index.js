@@ -52,7 +52,6 @@ window.onload = async () => {
     });
 
     setTimeout(async () => {
-        console.log('we here');
         let data = await fetchGarbageData();
         data = [{
             "bag_5L": 1,
