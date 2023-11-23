@@ -186,8 +186,8 @@ window.onload = async () => {
     setInterval(() => {
         if (
             prevLL &&
-            Math.abs(prevLL.lat - LL.lat) < 0.00002 &&
-            Math.abs(prevLL.lng - LL.lng) < 0.00002
+            Math.abs(prevLL.lat - LL.lat) < 0.0002 &&
+            Math.abs(prevLL.lng - LL.lng) < 0.0002
         )
             return;
         drawDirectionPaths('맘스터치 우송대점');
