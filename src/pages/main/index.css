@@ -25,6 +25,8 @@
     flex-wrap: wrap;
 
     transition: 0.1s transform;
+
+    z-index: 100;
 }
 
 #sidebar-chevron:has(#chevron-container input:checked) + #sidebar-container {
@@ -361,6 +363,9 @@
 
     width: 20rem;
     right: 0;
+
+    z-index: 99;
+    pointer-events: none;
 }
 
 .vehicle-speed-container {
@@ -376,6 +381,8 @@
 
     background-color: rgba(255, 255, 255, 0.75);
     border: 1px solid lightgreen;
+
+    pointer-events: auto;
 }
 
 .vehicle-speed {
@@ -430,6 +437,8 @@
     flex-direction: column;
 
     margin-bottom: 1rem;
+
+    pointer-events: auto;
 }
 
 .right-overlay-bottom > a:first-child {
@@ -513,6 +522,7 @@
     margin-top: 1rem;
     display: flex;
     justify-content: flex-end;
+    pointer-events: auto;
 }
 
 #location-lock {
