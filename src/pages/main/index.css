@@ -11,6 +11,7 @@
     width: 500px;
 
     height: 100vh;
+    max-height: 100vh;
 
     background-color: rgb(235, 235, 235);
 
@@ -22,11 +23,17 @@
     display: flex;
     flex-direction: column;
 
-    flex-wrap: wrap;
-
     transition: 0.1s transform;
 
     z-index: 100;
+}
+
+#sidebar-container::-webkit-scrollbar {
+    width: 5px;
+}
+
+#sidebar-container::-webkit-scrollbar-track {
+    background-color: lightslategray;
 }
 
 #sidebar-chevron:has(#chevron-container input:checked) + #sidebar-container {
@@ -154,7 +161,7 @@
     align-items: baseline;
 
     padding-left: 3rem;
-    margin-bottom: 1rem;
+    margin-bottom: max(min(1vh, 1rem), 0.2rem);
 }
 
 .eco-rating-container .eco-img {
@@ -184,7 +191,9 @@
 
 .drive-stats .drive-stat {
     width: 28%;
-    height: 6rem;
+    height: 16vh;
+    min-height: 5rem;
+    max-height: 7rem;
 
     border: 1px solid lightgreen;
 
@@ -225,8 +234,6 @@
     flex-direction: column;
 
     width: 85%;
-
-    transform: translateX(-0.5rem);
 
     border: 1px solid lightgreen;
 
@@ -546,7 +553,8 @@
     height: 90%;
 }
 
-.link-to-page, .link-to-page * {
+.link-to-page,
+.link-to-page * {
     text-decoration: none;
     color: inherit;
     cursor: pointer;

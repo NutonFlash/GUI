@@ -34,6 +34,8 @@ window.onload = async () => {
     let lng = 127.4468659;
     options.center = new kakao.maps.LatLng(lat, lng);
 
+    LL = { lat: lat, lng: lng };
+    prevLL = { ...LL };
     _kakaoLL = options.center;
 
     map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
@@ -48,11 +50,23 @@ window.onload = async () => {
 
     kakao.maps.event.addListener(map, 'dragstart', function () {
         lockView = false;
-
-        map.setCenter();
     });
 
-    setTimeout(async () => {
+    drawDirectionPaths('맘스터치 우송대점');
+
+    setInterval(() => {
+        if (
+            prevLL &&
+            Math.abs(prevLL.lat - LL.lat) < 0.0002 &&
+            Math.abs(prevLL.lng - LL.lng) < 0.0002
+        )
+            return;
+        prevLL = { ...LL };
+
+        drawDirectionPaths('맘스터치 우송대점');
+    }, 5000);
+  
+    setInterval(async () => {
         let data = await fetchGarbageData();
         data = [{
             "bag_5L": 1,
