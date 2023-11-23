@@ -72,7 +72,7 @@ function createUserMarker(map, lat, lng, orientation = 0) {
 }
 
 window.onload = async () => {
-    console.log(await getLatLngFromKeyword('맘스터치 우송대점'));
+    // console.log(await getLatLngFromKeyword('맘스터치 우송대점'));
 
     hideAlert();
     dtg = new DTG();

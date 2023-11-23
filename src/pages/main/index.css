@@ -25,6 +25,8 @@
     flex-wrap: wrap;
 
     transition: 0.1s transform;
+
+    z-index: 100;
 }
 
 #sidebar-chevron:has(#chevron-container input:checked) + #sidebar-container {
@@ -407,6 +409,7 @@
 
 .right-overlay > div {
     height: 49vh;
+    z-index: 99;
 }
 
 .right-overlay-bottom {
