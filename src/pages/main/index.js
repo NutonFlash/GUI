@@ -233,7 +233,6 @@ window.onload = async () => {
     drawDirectionPaths('맘스터치 우송대점');
 
     setInterval(() => {
-        console.log('c');
         if (
             prevLL &&
             Math.abs(prevLL.lat - LL.lat) < 0.0002 &&
