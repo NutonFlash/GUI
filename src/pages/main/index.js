@@ -1,4 +1,4 @@
-let dtg, map, _kakaoLL, LL;
+let dtg, map, _kakaoLL, LL, prevLL;
 
 let userMarker = null;
 
@@ -161,6 +161,7 @@ window.onload = async () => {
     let lng = 127.4468659;
     options.center = new kakao.maps.LatLng(lat, lng);
 
+    prevLL = { ...LL };
     LL = { lat: lat, lng: lng };
     _kakaoLL = options.center;
 
@@ -183,6 +184,12 @@ window.onload = async () => {
     drawDirectionPaths('맘스터치 우송대점');
 
     setInterval(() => {
+        if (
+            prevLL &&
+            Math.abs(prevLL.lat - LL.lat) < 0.00002 &&
+            Math.abs(prevLL.lng - LL.lng) < 0.00002
+        )
+            return;
         drawDirectionPaths('맘스터치 우송대점');
     }, 5000);
 };
