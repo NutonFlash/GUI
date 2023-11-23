@@ -51,9 +51,25 @@ window.onload = async () => {
         map.setCenter();
     });
 
-    await new Promise(res => setTimeout(res, 5000));
-    let data = await fetchGarbageData();
-    console.log(data);
+    setTimeout(async () => {
+        console.log('we here');
+        let data = await fetchGarbageData();
+        data = [{
+            "bag_5L": 1,
+            "bag_10L": 2,
+            "bag_20L": 3,
+            "bag_30L": 4,
+            "bag_50L": 5,
+            "bag_75L": 6,
+            "bag_etc": 7,
+            "others": 8,
+            "weight": 20,
+            "volume": 9
+        }];
+        if (data.length > 0) {
+            updateGarbageStats(data[0]);
+        }
+    }, 5000);
 };
 
 async function drawDirectionPaths(to, from = LL) {
@@ -184,67 +200,6 @@ function createUserMarker(map, lat, lng, orientation = 0) {
     userMarker.circle.setMap(map);
 }
 
-window.onload = async () => {
-    hideAlert();
-    dtg = new DTG();
-
-    document.getElementById('backBtn').onclick = () => {
-        let t = document.createElement('a');
-        t.href = '../login/index.html';
-        t.click();
-    };
-
-    document.getElementById('location-lock').onclick = () => {
-        lockView = true;
-
-        map.setCenter(_kakaoLL);
-    };
-
-    var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
-    var options = {
-        //지도를 생성할 때 필요한 기본 옵션
-        center: null, //지도의 중심좌표.
-        level: 3, //지도의 레벨(확대, 축소 정도)
-    };
-
-    let lat = 36.3401454;
-    let lng = 127.4468659;
-    options.center = new kakao.maps.LatLng(lat, lng);
-
-    LL = { lat: lat, lng: lng };
-    prevLL = { ...LL };
-    _kakaoLL = options.center;
-
-    map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
-
-    createUserMarker(map, lat, lng);
-
-    document.getElementById('bind-dtg').onclick = () => {
-        let id = document.getElementById('dtg-id').value;
-
-        dtg.bind(id, displayDTGData);
-    };
-
-    kakao.maps.event.addListener(map, 'dragstart', function () {
-        lockView = false;
-    });
-
-    drawDirectionPaths('맘스터치 우송대점');
-
-    setInterval(() => {
-        console.log('c');
-        if (
-            prevLL &&
-            Math.abs(prevLL.lat - LL.lat) < 0.0002 &&
-            Math.abs(prevLL.lng - LL.lng) < 0.0002
-        )
-            return;
-        prevLL = { ...LL };
-
-        drawDirectionPaths('맘스터치 우송대점');
-    }, 5000);
-};
-
 function displayDTGData(data) {
     if ('message' in data) {
         console.log(data);
@@ -353,4 +308,37 @@ async function fetchGarbageData() {
         request.send();
     });
     return data;
+}
+
+function updateGarbageStats(data) {
+    const totalCountNode = document.getElementById('garbage-totalcount');
+    let totalCount = data.bag_5L + data.bag_10L + data.bag_20L + data.bag_30L + data.bag_50L + data.bag_75L + data.bag_etc + data.others;
+    totalCountNode.innerText = totalCount;
+
+    const totalWeightNode = document.getElementById('garbage-totalweight');
+    totalWeightNode.innerText = data.weight;
+
+    const _5LCountNode = document.getElementById('garbage-5L');
+    _5LCountNode.innerText = data.bag_5L;
+
+    const _10LCountNode = document.getElementById('garbage-10L');
+    _10LCountNode.innerText = data.bag_10L;
+
+    const _20LCountNode = document.getElementById('garbage-20L');
+    _20LCountNode.innerText = data.bag_20L;
+
+    const _30LCountNode = document.getElementById('garbage-30L');
+    _30LCountNode.innerText = data.bag_30L;
+
+    const _50LCountNode = document.getElementById('garbage-50L');
+    _50LCountNode.innerText = data.bag_50L;
+
+    const _75LCountNode = document.getElementById('garbage-75L');
+    _75LCountNode.innerText = data.bag_75L;
+
+    const etcCountNode = document.getElementById('garbage-etc');
+    etcCountNode.innerText = data.bag_etc;
+
+    const errCountNode = document.getElementById('garbage-error');
+    errCountNode.innerText = data.others;
 }
