@@ -545,3 +545,9 @@
     width: 90%;
     height: 90%;
 }
+
+.link-to-page, .link-to-page * {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
