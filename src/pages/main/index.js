@@ -18,7 +18,7 @@ async function drawDirectionPaths(to, from = LL) {
     let path = new kakao.maps.Polyline({
         map: map,
         strokeWeight: 5,
-        strokeColor: '#2222FF',
+        strokeColor: '#3535FF',
         strokeOpacity: 0.9,
         strokeStyle: 'solid',
     });
