@@ -1,0 +1,377 @@
+@font-face {
+    font-family: 'NotoSansKR';
+    src: url('../../fonts/NotoSansKR.ttf');
+}
+
+* {
+    font-family: 'NotoSansKR';
+}
+
+#header-block {
+    width: 100%;
+    height: 100px;
+    display: flex;
+    align-items: center;
+}
+#home-link-wrapper {
+    display: inline-block;
+    margin: 0 15px;
+    border: 2px solid #a3de4b;
+    border-radius: 15px;
+}
+#home-link img {
+    width: 45px;
+    height: 45px;
+    padding: 5px;
+}
+#records-page-header {
+    width: 100%;
+    margin-left: 20px;
+    font-size: 1.25rem;
+}
+.records-separator-wrapper {
+    display: flex;
+    height: 3px;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+.records-separator {
+    width: 95%;
+    height: 100%;
+    background-color: #a3de4b;
+    border-radius: 5px;
+}
+
+#sidebar-container {
+    width: 400px;
+
+    height: fit-content;
+
+    background-color: rgb(235, 235, 235);
+
+    position: fixed;
+
+    top: 125px;
+    left: 15px;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+
+    flex-wrap: wrap;
+
+    transition: 0.1s transform;
+}
+
+#sidebar-chevron:has(#chevron-container input:checked) + #sidebar-container {
+    transform: translateX(-415px);
+}
+
+#sidebar-chevron:has(#chevron-container input:checked) {
+    transform: translate(0px, -45px);
+}
+
+#chevron-container:has(input:checked) img {
+    rotate: 180deg;
+}
+
+#sidebar-chevron {
+    width: 30px;
+    height: 100vh;
+
+    transform: translate(400px, -45px);
+
+    position: fixed;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.1s transform;
+
+    z-index: 998;
+}
+
+#sidebar-chevron #chevron-container {
+    width: 15px;
+    height: 3rem;
+
+    background-color: rgb(235, 235, 235);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgb(220, 220, 220);
+    border-radius: 2px;
+
+    cursor: pointer;
+
+    user-select: none;
+}
+
+#chevron-container:hover {
+    filter: brightness(110%);
+}
+
+#sidebar-chevron img {
+    width: 100%;
+}
+
+.visually-hidden {
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+#sidebar-container .top-bar {
+    margin: .3rem 0;
+    padding-left: 2rem;
+    background-color: green;
+    color: white;
+    font-weight: bold;
+}
+
+.car-info {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: .5rem 0;
+}
+
+.car-info #car-detail {
+    padding: 0.25rem 0.5rem;
+
+    font-size: 1rem;
+    width: 75%;
+
+    border: 2px solid green;
+
+    border-top-left-radius: 7px;
+    border-bottom-left-radius: 7px;
+}
+
+.car-info #dropdown-misc {
+    width: 2rem;
+
+    border: 2px solid green;
+    border-left: none;
+
+    border-top-right-radius: 7px;
+    border-bottom-right-radius: 7px;
+    cursor: pointer;
+}
+
+#dropdown-misc img {
+    transform: translateX(-3px);
+}
+
+.eco-rating-container {
+    display: flex;
+    color: green;
+    align-items: baseline;
+
+    padding-left: 3rem;
+    margin-bottom: .55rem;
+}
+
+.eco-rating-container .eco-img {
+    width: 2rem;
+    padding-bottom: .25rem;
+}
+
+.eco-rating-container #eco-rating {
+    font-size: 1.75rem;
+    font-weight: bold;
+}
+
+.eco-rating-container .eco-jeom {
+    font-size: 1.15rem;
+    height: fit-content;
+}
+
+.drive-stats {
+    width: 85%;
+    display: flex;
+    justify-content: center;
+    margin: 0 auto .75rem;
+    flex-wrap: wrap;
+}
+
+.drive-stats .drive-stat {
+    width: 32%;
+    height: 4rem;
+
+    border: 1px solid lightgreen;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
+    padding-top: 0.3rem;
+
+    color: darkslategray;
+}
+
+.drive-stat > div .stat-main {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.drive-stat > div .stat-sub {
+    font-size: 1.15rem;
+    font-weight: bold;
+}
+
+.drive-stat > div .lbl-med {
+    font-size: 1rem;
+}
+
+.drive-stat > div .lbl-small {
+    font-size: .8rem;
+}
+
+.garbage-stats {
+    display: flex;
+    flex-direction: column;
+
+    width: 85%;
+
+    border: 1px solid lightgreen;
+
+    border-radius: 7px;
+
+    margin: 0 auto 0.3rem;
+}
+
+.garbage-stats .garbage-overview {
+    display: flex;
+
+    justify-content: space-around;
+
+    width: 100%;
+    height: 3rem;
+
+    border-bottom: 1px solid lightgreen;
+}
+
+.garbage-overview .garbage-totalcount {
+    flex-grow: 6;
+    width: 42%;
+
+    display: flex;
+
+    justify-content: center;
+
+    line-height: 3rem;
+}
+
+.garbage-totalcount #garbage-totalcount {
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 0 5px;
+}
+.garbage-totalcount img {
+    width: 1.5rem;
+}
+.garbage-totalcount label {
+    color: green;
+    font-weight: bold;
+    font-size: 1.25rem;
+    line-height: 3rem;
+}
+
+.garbage-overview .garbage-avg {
+    width: 16%;
+
+    display: flex;
+    flex-direction: column;
+
+    background-color: green;
+
+    color: white;
+
+    text-align: center;
+}
+
+.garbage-avg label {
+    border-bottom: 2px solid white;
+    font-size: 0.6rem;
+}
+
+.garbage-avg span {
+    font-weight: bold;
+    font-size: 1.15rem;
+
+    line-height: 2rem;
+}
+
+.garbage-overview .garbage-totalweight {
+    flex-grow: 6;
+    width: 42%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.garbage-totalweight #garbage-totalweight {
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 0 5px;
+}
+
+.garbage-totalweight label {
+    color: green;
+    font-weight: bold;
+    font-size: 1.25rem;
+
+    line-height: 3rem;
+}
+
+.garbage-details {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    width: 100%;
+}
+
+.garbage-details .garbage-stat {
+    width: 20%;
+    height: 4rem;
+
+    margin: 0 5px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.25rem;
+    font-weight: bold;
+
+    color: darkslategray;
+
+    flex-grow: 1;
+}
+
+.garbage-stat img {
+    margin-right: 0.35rem;
+    width: 2.25rem;
+}
+
+.garbage-stat span {
+    font-size: 1.25rem;
+}

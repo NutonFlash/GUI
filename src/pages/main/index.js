@@ -6,6 +6,57 @@ let lockView = true;
 
 let oldDirectionPaths = [];
 
+
+window.onload = async () => {
+    hideAlert();
+    dtg = new DTG();
+
+    document.getElementById('backBtn').onclick = () => {
+        let t = document.createElement('a');
+        t.href = '../login/index.html';
+        t.click();
+    };
+
+    document.getElementById('location-lock').onclick = () => {
+        lockView = true;
+
+        map.setCenter(_kakaoLL);
+    };
+
+    var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
+    var options = {
+        //지도를 생성할 때 필요한 기본 옵션
+        center: null, //지도의 중심좌표.
+        level: 3, //지도의 레벨(확대, 축소 정도)
+    };
+
+    let lat = 36.3401454;
+    let lng = 127.4468659;
+    options.center = new kakao.maps.LatLng(lat, lng);
+
+    _kakaoLL = options.center;
+
+    map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+
+    createUserMarker(map, lat, lng);
+
+    document.getElementById('bind-dtg').onclick = () => {
+        let id = document.getElementById('dtg-id').value;
+
+        dtg.bind(id, displayDTGData);
+    };
+
+    kakao.maps.event.addListener(map, 'dragstart', function () {
+        lockView = false;
+
+        map.setCenter();
+    });
+
+    await new Promise(res => setTimeout(res, 5000));
+    let data = await fetchGarbageData();
+    console.log(data);
+};
+
 async function drawDirectionPaths(to, from = LL) {
     for (let op of oldDirectionPaths) op.setMap(null);
 
@@ -280,4 +331,27 @@ function showAlert(title = '', content = '') {
 
 function hideAlert() {
     document.getElementById('alert-container').style.display = 'none';
+}
+
+async function fetchGarbageData() {
+    let data = null;
+    await new Promise((res, rej) => {
+        const request = new XMLHttpRequest();
+        const serverUrl = 'http://localhost:5000';
+        request.open('GET', serverUrl + '/collection')
+        request.onreadystatechange = () => {
+            if (request.readyState === XMLHttpRequest.DONE) {
+                const status = request.status;
+                if (status === 0 || (status >= 200 && status < 400)) {
+                    data = JSON.parse(request.responseText);
+                    res();
+                } else {
+                    rej();
+                }
+            }
+        };
+        request.setRequestHeader('Authorization', 'Bearer ' + JSON.parse(localStorage.getItem('user')).token)
+        request.send();
+    });
+    return data;
 }
