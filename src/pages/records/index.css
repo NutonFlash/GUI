@@ -66,6 +66,63 @@
     transition: 0.1s transform;
 }
 
+#sidebar-chevron:has(#chevron-container input:checked) + #sidebar-container {
+    transform: translateX(-415px);
+}
+
+#sidebar-chevron:has(#chevron-container input:checked) {
+    transform: translate(0px, -45px);
+}
+
+#chevron-container:has(input:checked) img {
+    rotate: 180deg;
+}
+
+#sidebar-chevron {
+    width: 30px;
+    height: 100vh;
+
+    transform: translate(400px, -45px);
+
+    position: fixed;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.1s transform;
+
+    z-index: 998;
+}
+
+#sidebar-chevron #chevron-container {
+    width: 15px;
+    height: 3rem;
+
+    background-color: rgb(235, 235, 235);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid rgb(220, 220, 220);
+    border-radius: 2px;
+
+    cursor: pointer;
+
+    user-select: none;
+}
+
+#chevron-container:hover {
+    filter: brightness(110%);
+}
+
+#sidebar-chevron img {
+    width: 100%;
+}
+
 .visually-hidden {
     clip: rect(0 0 0 0);
     clip-path: inset(50%);

@@ -22,10 +22,11 @@ function enableLoginInput() {
 }
 
 function displayWorkers() {
-    let details = `<p><span class="bold-text">배차</span>2023-0718-001<span class="bold-text"> 첨단1,2구역</span></p>
-    <p>운전원 유재석</p>
-    <p>탑승원 강호동</p>
-    <p>탑승원 신동엽</p>`;
+    let user = JSON.parse(localStorage.getItem('user'));
+    let details = `<p><span class="bold-text">배차</span>2023-0718-001<span class="bold-text">${user.area}</span></p>
+    <p>${user.driver}</p>
+    <p>${user.crew1}</p>
+    <p>${user.crew2}</p>`;
 
     document.getElementById('car-details').innerHTML = details;
 }
@@ -38,9 +39,9 @@ function handleEdit() {
     enableLoginInput();
 }
 
-function handleConfirm() {
+async function handleConfirm() {
     if (!user.authorized) {
-        if (authorizeDriver()) {
+        if (await authorizeDriver()) {
             displayWorkers();
         } else showAlert('Invalid Credentials');
     } else {
@@ -50,26 +51,36 @@ function handleConfirm() {
     }
 }
 
-function authorizeDriver() {
-    const users = {
-        admin: true,
-        test1: true,
-    };
-
-    let carIdInput = document.getElementById('car-id');
-    let carId = carIdInput.value;
-
-    carIdInput.value = '';
-
-    let userExists = users[carId] || false;
-    if (userExists) {
-        user.authorized = true;
-        user.id = carId;
-
-        localStorage.setItem('user', JSON.stringify(user));
-    }
-
-    return userExists;
+async function authorizeDriver() {
+    let isAthorized = false;
+    const dispatch_no = document.getElementById('car-id').value;
+    await new Promise((resolve, reject) => {
+        const request = new XMLHttpRequest();
+        const serverUrl = 'http://localhost:5000';
+        request.open('POST', serverUrl + '/login')
+        request.onreadystatechange = () => {
+            if (request.readyState === XMLHttpRequest.DONE) {
+                const status = request.status;
+                if (status === 0 || (status >= 200 && status < 400)) {
+                    isAthorized = true;
+                    const response = JSON.parse(request.responseText);
+                    console.log(response);
+                    response.authorized = true;
+                    user = response;
+                    localStorage.setItem('user', JSON.stringify(response));
+                    resolve();
+                } else {
+                    if (status == 404) {
+                        showAlert('Dispatch No Not Found', 'Check your dispatch number');
+                    }
+                    reject();
+                }
+            }
+        };
+        request.setRequestHeader('Content-Type', 'application/json')
+        request.send(JSON.stringify({dispatch_no}));
+    });
+    return isAthorized;
 }
 
 function handleClick() {

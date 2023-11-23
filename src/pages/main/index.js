@@ -1,57 +1,12 @@
-let dtg, map, _kakaoLL;
+let dtg, map, _kakaoLL, LL, prevLL;
 
 let userMarker = null;
 
 let lockView = true;
 
-function degToRad(deg) {
-    return (deg * Math.PI) / 180;
-}
-function rotate(x, y, theta) {
-    return {
-        x: x * Math.cos(degToRad(theta)) - y * Math.sin(degToRad(theta)),
-        y: x * Math.sin(degToRad(theta)) + y * Math.cos(degToRad(theta)),
-    };
-}
+let oldDirectionPaths = [];
 
-function createUserMarker(map, lat, lng, orientation = 0) {
-    if (userMarker != null) {
-        userMarker.circle.setMap(null);
-        userMarker.pointer.setMap(null);
-    } else {
-        userMarker = { circle: null, pointer: null };
-    }
-
-    let rad = 1.5;
-    userMarker.circle = new kakao.maps.Circle({
-        center: new kakao.maps.LatLng(lat, lng), // 원의 중심좌표 입니다
-        radius: rad, // 미터 단위의 원의 반지름입니다
-        strokeWeight: 5, // 선의 두께입니다
-        strokeColor: '#7777FF', // 선의 색깔입니다
-        strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
-        strokeStyle: 'solid', // 선의 스타일 입니다
-        fillColor: '#7777FF', // 채우기 색깔입니다
-        fillOpacity: 1, // 채우기 불투명도 입니다
-    });
-
-    let d = rotate(0, -0.000015, orientation);
-
-    userMarker.pointer = new kakao.maps.Circle({
-        center: new kakao.maps.LatLng(lat - d.y, lng + d.x), // 원의 중심좌표 입니다
-        radius: 0.8, // 미터 단위의 원의 반지름입니다
-        strokeWeight: 5, // 선의 두께입니다
-        strokeColor: '#7777FF', // 선의 색깔입니다
-        strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
-        strokeStyle: 'solid', // 선의 스타일 입니다
-        fillColor: '#7777FF', // 채우기 색깔입니다
-        fillOpacity: 1, // 채우기 불투명도 입니다
-    });
-
-    userMarker.circle.setMap(map);
-    userMarker.pointer.setMap(map);
-}
-
-window.onload = () => {
+window.onload = async () => {
     hideAlert();
     dtg = new DTG();
 
@@ -95,6 +50,199 @@ window.onload = () => {
 
         map.setCenter();
     });
+
+    await new Promise(res => setTimeout(res, 5000));
+    let data = await fetchGarbageData();
+    console.log(data);
+};
+
+async function drawDirectionPaths(to, from = LL) {
+    for (let op of oldDirectionPaths) op.setMap(null);
+
+    oldDirectionPaths = [];
+
+    let waypoints = await getDirectionFromLatLng(
+        await getLatLngFromKeyword(to),
+    );
+
+    let path = new kakao.maps.Polyline({
+        map: map,
+        strokeWeight: 5,
+        strokeColor: '#3535FF',
+        strokeOpacity: 0.9,
+        strokeStyle: 'solid',
+    });
+
+    let paths = [];
+
+    for (let wp of waypoints) {
+        let count = 0;
+
+        let _LL = { lat: -1, lng: -1 };
+        for (let vert of wp.vertexes) {
+            if (count === 0) {
+                _LL.lng = vert;
+                count = 1;
+            } else {
+                _LL.lat = vert;
+                count = 0;
+
+                paths.push(new kakao.maps.LatLng(_LL.lat, _LL.lng));
+            }
+        }
+    }
+
+    path.setPath(paths);
+    oldDirectionPaths.push(path);
+}
+
+async function getDirectionFromLatLng(to, from = LL) {
+    let endpoint = `https://apis-navi.kakaomobility.com/v1/directions?origin=${from.lng},${from.lat}&destination=${to.lng},${to.lat}`;
+    let res = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+            Authorization: 'KakaoAK 032038e1b0b7aae5472e7395fdb9d40b',
+        },
+    });
+
+    res = await res.json();
+    res = res?.routes[0]?.sections[0].roads;
+    if (!res) {
+        showAlert(
+            `Direction to ${to.lat}, ${to.lng} from ${from.lat},${from.lng} not found`,
+        );
+    }
+
+    return res;
+}
+
+async function getLatLngFromKeyword(keyword) {
+    let endpoint = `https://dapi.kakao.com/v2/local/search/keyword.json?query=${keyword}`;
+    let res = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+            Authorization: 'KakaoAK 032038e1b0b7aae5472e7395fdb9d40b',
+        },
+    });
+
+    res = await res.json();
+
+    let docs = res.documents;
+    if (docs.length <= 0) {
+        showAlert(`Location ${keyword} not found`);
+        return null;
+    }
+
+    return { lat: docs[0].y, lng: docs[0].x };
+}
+
+function degToRad(deg) {
+    return (deg * Math.PI) / 180;
+}
+function rotate(x, y, theta) {
+    return {
+        x: x * Math.cos(degToRad(theta)) - y * Math.sin(degToRad(theta)),
+        y: x * Math.sin(degToRad(theta)) + y * Math.cos(degToRad(theta)),
+    };
+}
+
+function createUserMarker(map, lat, lng, orientation = 0) {
+    if (userMarker != null) {
+        userMarker.circle.setMap(null);
+        userMarker.pointer.setMap(null);
+    } else {
+        userMarker = { circle: null, pointer: null };
+    }
+
+    let rad = 1.5;
+    userMarker.circle = new kakao.maps.Circle({
+        center: new kakao.maps.LatLng(lat, lng), // 원의 중심좌표 입니다
+        radius: rad, // 미터 단위의 원의 반지름입니다
+        strokeWeight: 5, // 선의 두께입니다
+        strokeColor: '#7777FF', // 선의 색깔입니다
+        strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+        strokeStyle: 'solid', // 선의 스타일 입니다
+        fillColor: '#7777FF', // 채우기 색깔입니다
+        fillOpacity: 1, // 채우기 불투명도 입니다
+    });
+
+    let d = rotate(0, -0.000015, orientation);
+
+    userMarker.pointer = new kakao.maps.Circle({
+        center: new kakao.maps.LatLng(lat - d.y, lng + d.x), // 원의 중심좌표 입니다
+        radius: 0.8, // 미터 단위의 원의 반지름입니다
+        strokeWeight: 5, // 선의 두께입니다
+        strokeColor: '#5555FF', // 선의 색깔입니다
+        strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+        strokeStyle: 'solid', // 선의 스타일 입니다
+        // strokeDasharray: '5',
+        fillColor: '#5555FF', // 채우기 색깔입니다
+        fillOpacity: 1, // 채우기 불투명도 입니다
+    });
+
+    userMarker.pointer.setMap(map);
+    userMarker.circle.setMap(map);
+}
+
+window.onload = async () => {
+    hideAlert();
+    dtg = new DTG();
+
+    document.getElementById('backBtn').onclick = () => {
+        let t = document.createElement('a');
+        t.href = '../login/index.html';
+        t.click();
+    };
+
+    document.getElementById('location-lock').onclick = () => {
+        lockView = true;
+
+        map.setCenter(_kakaoLL);
+    };
+
+    var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
+    var options = {
+        //지도를 생성할 때 필요한 기본 옵션
+        center: null, //지도의 중심좌표.
+        level: 3, //지도의 레벨(확대, 축소 정도)
+    };
+
+    let lat = 36.3401454;
+    let lng = 127.4468659;
+    options.center = new kakao.maps.LatLng(lat, lng);
+
+    LL = { lat: lat, lng: lng };
+    prevLL = { ...LL };
+    _kakaoLL = options.center;
+
+    map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+
+    createUserMarker(map, lat, lng);
+
+    document.getElementById('bind-dtg').onclick = () => {
+        let id = document.getElementById('dtg-id').value;
+
+        dtg.bind(id, displayDTGData);
+    };
+
+    kakao.maps.event.addListener(map, 'dragstart', function () {
+        lockView = false;
+    });
+
+    drawDirectionPaths('맘스터치 우송대점');
+
+    setInterval(() => {
+        console.log('c');
+        if (
+            prevLL &&
+            Math.abs(prevLL.lat - LL.lat) < 0.0002 &&
+            Math.abs(prevLL.lng - LL.lng) < 0.0002
+        )
+            return;
+        prevLL = { ...LL };
+
+        drawDirectionPaths('맘스터치 우송대점');
+    }, 5000);
 };
 
 function displayDTGData(data) {
@@ -113,6 +261,8 @@ function displayDTGData(data) {
     let suddenbrake = data.sudden_brake;
     let suddenaccel = data.sudden_accel;
     let orientation = data.orientation / data.factor_deg;
+    let rpm =
+        (data.engine_running ? 1000 : 0) + convRpm(speed) + convRpm(accel);
 
     pos = latlng;
 
@@ -127,10 +277,11 @@ function displayDTGData(data) {
 
     document.getElementById('vehicle-speed').innerText = speed;
 
-    document.getElementById('vehicle-rpm').innerText =
-        (data.engine_running ? 1000 : 0) + convRpm(speed) + convRpm(accel);
+    document.getElementById('vehicle-rpm').innerText = rpm;
 
     let kakaoLL = new kakao.maps.LatLng(latlng.lat, latlng.lng);
+    LL.lat = latlng.lat;
+    LL.lng = latlng.lng;
 
     createUserMarker(map, latlng.lat, latlng.lng, orientation);
 
@@ -179,4 +330,27 @@ function showAlert(title = '', content = '') {
 
 function hideAlert() {
     document.getElementById('alert-container').style.display = 'none';
+}
+
+async function fetchGarbageData() {
+    let data = null;
+    await new Promise((res, rej) => {
+        const request = new XMLHttpRequest();
+        const serverUrl = 'http://localhost:5000';
+        request.open('GET', serverUrl + '/collection')
+        request.onreadystatechange = () => {
+            if (request.readyState === XMLHttpRequest.DONE) {
+                const status = request.status;
+                if (status === 0 || (status >= 200 && status < 400)) {
+                    data = JSON.parse(request.responseText);
+                    res();
+                } else {
+                    rej();
+                }
+            }
+        };
+        request.setRequestHeader('Authorization', 'Bearer ' + JSON.parse(localStorage.getItem('user')).token)
+        request.send();
+    });
+    return data;
 }

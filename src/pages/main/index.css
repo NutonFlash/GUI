@@ -364,23 +364,13 @@
 }
 
 .vehicle-speed-container {
-<<<<<<< HEAD
-    width: 10rem;
-=======
     width: 13rem;
->>>>>>> main
     height: 8rem;
 
     margin-top: 1rem;
 
-<<<<<<< HEAD
-    padding-top: 1rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
-=======
     padding: 1rem;
     padding-bottom: 0;
->>>>>>> main
 
     border-radius: 5px;
 
@@ -390,11 +380,6 @@
 
 .vehicle-speed {
     color: rgb(83, 138, 232);
-<<<<<<< HEAD
-
-    margin-bottom: 1rem;
-=======
->>>>>>> main
 }
 
 .vehicle-speed #vehicle-speed {
@@ -461,13 +446,6 @@
     width: 50%;
 }
 
-<<<<<<< HEAD
-.link-to-page, .link-to-page * {
-     cursor: pointer;
-     color: black;
-     text-decoration: none;
-}
-=======
 #dropdown {
     display: none;
 
@@ -557,4 +535,9 @@
     width: 90%;
     height: 90%;
 }
->>>>>>> main
+
+.link-to-page, .link-to-page * {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
