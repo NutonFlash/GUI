@@ -6,6 +6,7 @@ let lockView = true;
 
 let oldDirectionPaths = [];
 
+
 window.onload = async () => {
     hideAlert();
     dtg = new DTG();

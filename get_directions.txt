@@ -1,3 +1,5 @@
+GET "https://dapi.kakao.com/v2/local/search/address.json"
+
 GET https://apis-navi.kakaomobility.com/v1/directions?origin=127.4468787,36.3401353&destination=127.4458787,36.3411353
 Authorization: KakaoAK 032038e1b0b7aae5472e7395fdb9d40b
 
