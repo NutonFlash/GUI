@@ -22,22 +22,31 @@
 
     display: flex;
     flex-direction: column;
+    justify-content: space-evenly;
 
-    transition: 0.1s transform;
+    transition: 0.3s transform;
 
     z-index: 100;
+
+    font-size: .7rem;
 }
 
-#sidebar-container::-webkit-scrollbar {
-    width: 5px;
+.sidebar-block {
+    width: 100%;
+    max-height: 30vh;
+    margin: .5em 0;
 }
 
-#sidebar-container::-webkit-scrollbar-track {
-    background-color: lightslategray;
+.sidebar-block:first-child {
+    margin-top: 0;
+}
+
+.sidebar-block:last-child {
+    margin-bottom: 1rem;
 }
 
 #sidebar-chevron:has(#chevron-container input:checked) + #sidebar-container {
-    transform: translateX(-485px);
+    transform: translateX(-500px);
 }
 
 #sidebar-chevron:has(#chevron-container input:checked) {
@@ -61,7 +70,7 @@
     align-items: center;
     justify-content: center;
 
-    transition: 0.1s transform;
+    transition: 0.3s transform;
 
     z-index: 998;
 }
@@ -111,10 +120,27 @@
     width: 1px;
 }
 
-#sidebar-container .top-bar {
-    padding: 0.3rem;
-    padding-left: 2rem;
+#sidebar-header {
+    position: absolute;
+    top: 0;
+    width: 500px;
+    flex: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: green;
+}
+
+#backBtn {
+    background-color: transparent;
+    height: 2rem;
+    border: none;
+    cursor: pointer;
+    padding-right: 1rem;
+}
+
+#sidebar-container .top-bar {
+    padding-left: 2rem;
     color: white;
     font-weight: bold;
 }
@@ -166,34 +192,27 @@
 
 .eco-rating-container .eco-img {
     width: 2.5rem;
-    padding-bottom: 1rem;
+    padding-bottom: 1em;
 }
 
 .eco-rating-container #eco-rating {
-    font-size: 4rem;
+    font-size: 4em;
     font-weight: bold;
 }
 
 .eco-rating-container .eco-jeom {
-    font-size: 2rem;
+    font-size: 2em;
     height: fit-content;
 }
 
 .drive-stats {
-    width: 100%;
     display: flex;
     flex-wrap: wrap;
-
     justify-content: center;
-
-    margin-bottom: 1rem;
 }
 
 .drive-stats .drive-stat {
     width: 28%;
-    height: 16vh;
-    min-height: 5rem;
-    max-height: 7rem;
 
     border: 1px solid lightgreen;
 
@@ -201,32 +220,31 @@
     flex-direction: column;
 
     align-items: center;
-
-    padding-top: 0.3rem;
-
+    
+    padding: .25rem 0;
     color: darkslategray;
 }
 
 .drive-stat .stats-label {
-    margin-bottom: 1rem;
+    margin-bottom: .75em;
 }
 
 .drive-stat > div .stat-main {
-    font-size: 2rem;
+    font-size: 2em;
     font-weight: bold;
 }
 
 .drive-stat > div .stat-sub {
-    font-size: 1.5rem;
+    font-size: 1.5em;
     font-weight: bold;
 }
 
 .drive-stat > div .lbl-med {
-    font-size: 1.3rem;
+    font-size: 1.3em;
 }
 
 .drive-stat > div .lbl-small {
-    font-size: 1rem;
+    font-size: 1em;
 }
 
 .garbage-stats {
@@ -249,7 +267,7 @@
     justify-content: space-around;
 
     width: 100%;
-    height: 4rem;
+    height: 4em;
 
     border-bottom: 1px solid lightgreen;
 }
@@ -261,20 +279,24 @@
     display: flex;
 
     justify-content: center;
+    align-items: center;
+}
 
-    line-height: 4rem;
+.garbage-totalcount img {
+    width: 2em;
 }
 
 .garbage-totalcount #garbage-totalcount {
-    font-size: 2rem;
+    font-size: 2em;
     font-weight: bold;
+    padding: 0 5px;
 }
 
 .garbage-totalcount label {
     color: green;
     font-weight: bold;
-    font-size: 1.5rem;
-    line-height: 4.4rem;
+    font-size: 1.5em;
+    padding-top: .3em;
 }
 
 .garbage-overview .garbage-avg {
@@ -292,14 +314,12 @@
 
 .garbage-avg label {
     border-bottom: 2px solid white;
-    font-size: 0.8rem;
+    font-size: 0.8em;
 }
 
 .garbage-avg span {
     font-weight: bold;
-    font-size: 1.5rem;
-
-    line-height: 2.5rem;
+    font-size: 1.5em;
 }
 
 .garbage-overview .garbage-totalweight {
@@ -313,16 +333,17 @@
 }
 
 .garbage-totalweight #garbage-totalweight {
-    font-size: 2rem;
+    font-size: 2em;
     font-weight: bold;
+    padding-right: 5px;
 }
 
 .garbage-totalweight label {
     color: green;
     font-weight: bold;
-    font-size: 1.5rem;
+    font-size: 1.5em;
 
-    transform: translateY(0.2rem);
+    padding-top: .3em;
 }
 
 .garbage-details {
@@ -330,19 +351,19 @@
 
     flex-wrap: wrap;
 
-    width: 100%;
+    margin: 0 10px;
 }
 
 .garbage-details .garbage-stat {
-    width: 6rem;
-    height: 4rem;
+    width: 23%;
+    height: 4em;
 
     display: flex;
 
     align-items: center;
     justify-content: center;
 
-    font-size: 1.5rem;
+    font-size: 1.5em;
     font-weight: bold;
 
     color: darkslategray;
@@ -351,6 +372,7 @@
 }
 
 .garbage-stat img {
+    width: 1.5em;
     margin-right: 0.5rem;
 }
 
@@ -558,4 +580,28 @@
     text-decoration: none;
     color: inherit;
     cursor: pointer;
+}
+
+@media screen and (orientation: landscape) and (min-height: 550px) {
+    #sidebar-container {
+        font-size: .8rem;
+    }
+}
+
+@media screen and (orientation: landscape) and (min-height: 650px) {
+    #sidebar-container {
+        font-size: .9rem;
+    }
+}
+
+@media screen and (orientation: landscape) and (min-height: 750px) {
+    #sidebar-container {
+        font-size: 1rem;
+    }
+}
+
+@media screen and (orientation: landscape) and (min-height: 850px) {
+    #sidebar-container {
+        font-size: 1.25rem;
+    }
 }
