@@ -94,7 +94,7 @@ window.onload = async () => {
             data.bag_50L++;
             data.bag_75L++;
             data.bag_etc++;
-            data.bag_others++;
+            data.others++;
             data.weight += 5;
         
             updateGarbageStats(data);
