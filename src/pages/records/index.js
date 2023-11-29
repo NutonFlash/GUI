@@ -1,30 +1,49 @@
+const firstTrunkData = {
+    "bag_5L": 155,
+    "bag_10L": 60,
+    "bag_20L": 35,
+    "bag_30L": 45,
+    "bag_50L": 35,
+    "bag_75L": 25,
+    "bag_etc": 15,
+    "others": 20,
+    "weight": 50,
+    "volume": 34
+}
+
+const initData = {
+    "bag_5L": 0,
+    "bag_10L": 0,
+    "bag_20L": 0,
+    "bag_30L": 0,
+    "bag_50L": 0,
+    "bag_75L": 0,
+    "bag_etc": 0,
+    "others": 0,
+    "weight": 0,
+    "volume": 0,
+    "avg": 0
+}
+
 window.onload = async () => {
-    const data = {
-            "bag_5L": 1,
-            "bag_10L": 2,
-            "bag_20L": 3,
-            "bag_30L": 4,
-            "bag_50L": 5,
-            "bag_75L": 6,
-            "bag_etc": 7,
-            "others": 8,
-            "weight": 20,
-            "volume": 9
-    };
-    
-    localStorage.setItem('garbageStats', data);
+
+    let data = localStorage.getItem('garbageStats');
+    if (!data) {
+        data = initData;
+        localStorage.setItem('garbageStats', JSON.stringify(data));
+    } else {
+        data = JSON.parse(data);
+    }
 
     document.getElementById('chevron-container').addEventListener('click', (evt) => {
         toggleSidebar(evt);
         const canvasArr = Array.from(document.querySelectorAll('.canvas'));
-        canvasArr.forEach(canvas => {
-            const computedWidth = canvas.parentNode.clientWidth;
-            const computedHeight = canvas.parentNode.clientHeight;
-            canvas.width = computedWidth;
-            canvas.height = computedHeight;
-            const sections = calcSections(data);
+        for (let i = 0; i < canvasArr.length; i++) {
+            const canvas = canvasArr[i];
+            let sections = null;
+            i == 0 ? sections = calcSections(firstTrunkData) : sections = calcSections(data);
             drawTrunk(canvas, sections);
-        });
+        }
     });
 
     hideAlert();
@@ -32,7 +51,6 @@ window.onload = async () => {
 
     document.getElementById('bind-dtg').onclick = () => {
         let id = document.getElementById('dtg-id').value;
-
         dtg.bind(id, displayDTGData);
     };
 
@@ -42,38 +60,33 @@ window.onload = async () => {
         //     localStorage.setItem('garbageStats', data[0]);
         // }
         if (data) {
+            const oldData = { ...data };
             data.bag_5L++;
             data.bag_10L++;
             data.bag_20L++;
-            data.bag_30L++;
+            data.bag_30L;
             data.bag_50L++;
-            data.bag_75L++;
+            data.bag_75L;
             data.bag_etc++;
             data.others++;
             data.weight += 5;
-        
+            data.avg = calcGarbageAvg(data, oldData);
+
+            //save data
+            localStorage.setItem('garbageStats', JSON.stringify(data));
+
+            //update stats and picture
             updateGarbageStats(data);
-            const canvasArr = Array.from(document.querySelectorAll('.canvas'));
-            canvasArr.forEach(canvas => {
-                const sections = calcSections(data);
-                drawTrunk(canvas, sections);
-            });
+            const block = document.getElementById('trunk-2');
+            const canvas = block.querySelector('.canvas');
+            const sections = calcSections(data);
+            drawTrunk(canvas, sections);
+            updateTrunkStats(sections, block);
         }
     }, 5000);
 
-    const canvasArr = Array.from(document.querySelectorAll('.canvas'));
-    canvasArr.forEach(canvas => {
-        const computedWidth = canvas.parentNode.clientWidth;
-        const computedHeight = canvas.parentNode.clientHeight;
-        canvas.width = computedWidth;
-        canvas.height = computedHeight;
-        const sections = calcSections(data);
-        drawTrunk(canvas, sections);
-    });
-
-    const sections = calcSections(data);
-    createTrunkStats();
-    updateTrunkStats(sections, document.getElementById('trunk-1'));
+    initTrunkInfo([firstTrunkData, data]);
+    updateGarbageStats(data);
 };
 
 function toggleSidebar(evt) {
@@ -200,6 +213,9 @@ function updateGarbageStats(data) {
     let totalCount = data.bag_5L + data.bag_10L + data.bag_20L + data.bag_30L + data.bag_50L + data.bag_75L + data.bag_etc + data.others;
     totalCountNode.innerText = totalCount;
 
+    const garbageAvgNode = document.getElementById('garbage-avg');
+    garbageAvgNode.innerText = data.avg;
+
     const totalWeightNode = document.getElementById('garbage-totalweight');
     totalWeightNode.innerText = data.weight;
 
@@ -229,9 +245,11 @@ function updateGarbageStats(data) {
 }
 
 function drawTrunk(canvas, sections) {
-    
-    const width = canvas.width;
-    const height = canvas.height;
+    // resize canvas
+    const width = canvas.parentNode.clientWidth;
+    const height = canvas.parentNode.clientHeight;
+    canvas.width = width;
+    canvas.height = height;
 
     const ctx = canvas.getContext('2d');
 
@@ -397,7 +415,7 @@ function calcSections(data) {
             labelEng: 'Mty',
             labelKor: '공간',
             color: '#ffffff',
-            volume: maxVolume - sections.reduce((totalVolume, section) => totalVolume + section.volume, initialValue,),
+            volume: Math.round((maxVolume - sections.reduce((totalVolume, section) => totalVolume + section.volume, initialValue,)) * 100) / 100,
         }
     )
 
@@ -417,11 +435,11 @@ function updateTrunkStats(sections, parent) {
             colorLabel.style = `background-color: ${sections[i].color};`;
         }
         const sizeLabel = parentNode.querySelector('.size-label');
-        sizeLabel.innerHTML = `${sections[i].labelEng} ${sections[i].labelKor}`;
+        sizeLabel.innerHTML = `<p> ${sections[i].labelEng} ${sections[i].labelKor} </p>`;
         const volumeLabel = parentNode.querySelector('.volume-label');
-        volumeLabel.innerHTML = `${sections[i].volume} m<sup>3</sup>`;
+        volumeLabel.innerHTML = `<p> ${sections[i].volume} m<sup>3</sup> </p>`;
         const fractionLabel = parentNode.querySelector('.fraction-label');
-        fractionLabel.innerHTML = `<b>${sections[i].fraction}%</b>`;
+        fractionLabel.innerHTML = `<p> <b>${sections[i].fraction}%</b> </p>`;
     }
 }
 
@@ -431,21 +449,63 @@ function createTrunkStats() {
         for (let i = 0; i < 9; i++) {
             const trunkStat = document.createElement('div');
             trunkStat.classList.add('trunk-stat');
+
+            const colorLabelWrapper = document.createElement('div');
             const colorLabel = document.createElement('div');
             colorLabel.classList.add('color-label');
+            colorLabelWrapper.appendChild(colorLabel);
+
             const sizeLabel = document.createElement('div');
             sizeLabel.classList.add('size-label');
+
             const volumeLabel = document.createElement('div');
             volumeLabel.classList.add('volume-label');
+
             const fractionLabel = document.createElement('div');
             fractionLabel.classList.add('fraction-label');
             
-            trunkStat.appendChild(colorLabel);
+            trunkStat.appendChild(colorLabelWrapper);
             trunkStat.appendChild(sizeLabel);
             trunkStat.appendChild(volumeLabel);
             trunkStat.appendChild(fractionLabel);
 
+            if (i == 8) {
+                trunkStat.classList.add('big-font');
+            }
+
             parent.appendChild(trunkStat);
+
+            if (i == 7) {
+                const separator = document.createElement('div');
+                separator.classList.add('stats-separator');
+                parent.appendChild(separator);
+            }
         }   
     });
+}
+
+function initTrunkInfo(dataArr) {
+    createTrunkStats();
+
+    let blocks = Array.from(document.querySelectorAll('.trunk-block'));
+    let canvases = Array.from(document.querySelectorAll('.canvas'));
+
+    for (let i = 0; i < 2; i++) {
+        let data = dataArr[i];
+        const sections = calcSections(data);
+        updateTrunkStats(sections, blocks[i]);
+        drawTrunk(canvases[i], sections);
+    }
+}
+
+function calcGarbageAvg(newData, oldData) {
+    let newTotalCount = 0;
+    let oldTotalCount = 0;
+    for (let prop in newData) {
+        if (prop !== 'weight' && prop !== 'volume' && prop !== 'avg') {
+            newTotalCount += newData[prop];
+            oldTotalCount += oldData[prop];
+        }
+    }
+    return newTotalCount - oldTotalCount;
 }
