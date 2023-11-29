@@ -13,12 +13,20 @@ func NewPool() *DTGPool {
 	return &DTGPool{make(map[string]*dtg.DTG)}
 }
 
-func (p *DTGPool) Get(id string) (*dtg.DTG, bool) {
-	dtg, ok := p.pool[id]
-	return dtg, ok
+func (p *DTGPool) Any() *dtg.DTG {
+	for _, v := range p.pool {
+		return v
+	}
+
+	return nil
 }
 
-func (p *DTGPool) Add(dtg *dtg.DTG) {
+func (p *DTGPool) Get(id string) (*dtg.DTG, bool) {
+	_dtg, ok := p.pool[id]
+	return _dtg, ok
+}
+
+func (p *DTGPool) Add(_dtg *dtg.DTG) {
 	chars := []rune{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
 
 	const idLen = 5
@@ -30,8 +38,8 @@ func (p *DTGPool) Add(dtg *dtg.DTG) {
 
 	id := string(_id)
 
-	dtg.ID = id
-	p.pool[id] = dtg
+	_dtg.ID = id
+	p.pool[id] = _dtg
 }
 
 func (p *DTGPool) Remove(id string) {

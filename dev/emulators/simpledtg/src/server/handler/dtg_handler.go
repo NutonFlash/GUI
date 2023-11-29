@@ -11,15 +11,22 @@ type HandlerResponse struct {
 	Message string `json:"message"`
 }
 
+func handleBind(_dtg *dtg.DTG, conn *connection.DTGConnection, send func(v any) error) {
+	conn.DTG = _dtg
+	_dtg.BindRecv(send)
+	conn.IsBind = true
+}
+
 func DTGHandler(payload *map[string]interface{}, conn *connection.DTGConnection, send func(v any) error) {
 	action := (*payload)["action"].(string)
 	switch action {
 	case "bind":
 		id := (*payload)["id"].(string)
-		if _dtg, ok := conn.DTGPool.Get(id); ok {
-			conn.DTG = _dtg
-			_dtg.BindRecv(send)
-			conn.IsBind = true
+		if id == "any" {
+			_dtg := conn.DTGPool.Any()
+			handleBind(_dtg, conn, send)
+		} else if _dtg, ok := conn.DTGPool.Get(id); ok {
+			handleBind(_dtg, conn, send)
 		} else {
 			send(HandlerResponse{"Failed to bind to DTG, id not found"})
 		}
