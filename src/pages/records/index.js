@@ -21,7 +21,8 @@ const initData = {
     "bag_etc": 0,
     "others": 0,
     "weight": 0,
-    "volume": 0
+    "volume": 0,
+    "avg": 0
 }
 
 window.onload = async () => {
@@ -33,8 +34,6 @@ window.onload = async () => {
     } else {
         data = JSON.parse(data);
     }
-
-    console.log(data);
 
     document.getElementById('chevron-container').addEventListener('click', (evt) => {
         toggleSidebar(evt);
@@ -61,6 +60,7 @@ window.onload = async () => {
         //     localStorage.setItem('garbageStats', data[0]);
         // }
         if (data) {
+            const oldData = { ...data };
             data.bag_5L++;
             data.bag_10L++;
             data.bag_20L++;
@@ -70,6 +70,7 @@ window.onload = async () => {
             data.bag_etc++;
             data.others++;
             data.weight += 5;
+            data.avg = calcGarbageAvg(data, oldData);
 
             //save data
             localStorage.setItem('garbageStats', JSON.stringify(data));
@@ -211,6 +212,9 @@ function updateGarbageStats(data) {
     const totalCountNode = document.getElementById('garbage-totalcount');
     let totalCount = data.bag_5L + data.bag_10L + data.bag_20L + data.bag_30L + data.bag_50L + data.bag_75L + data.bag_etc + data.others;
     totalCountNode.innerText = totalCount;
+
+    const garbageAvgNode = document.getElementById('garbage-avg');
+    garbageAvgNode.innerText = data.avg;
 
     const totalWeightNode = document.getElementById('garbage-totalweight');
     totalWeightNode.innerText = data.weight;
@@ -431,11 +435,11 @@ function updateTrunkStats(sections, parent) {
             colorLabel.style = `background-color: ${sections[i].color};`;
         }
         const sizeLabel = parentNode.querySelector('.size-label');
-        sizeLabel.innerHTML = `${sections[i].labelEng} ${sections[i].labelKor}`;
+        sizeLabel.innerHTML = `<p> ${sections[i].labelEng} ${sections[i].labelKor} </p>`;
         const volumeLabel = parentNode.querySelector('.volume-label');
-        volumeLabel.innerHTML = `${sections[i].volume} m<sup>3</sup>`;
+        volumeLabel.innerHTML = `<p> ${sections[i].volume} m<sup>3</sup> </p>`;
         const fractionLabel = parentNode.querySelector('.fraction-label');
-        fractionLabel.innerHTML = `<b>${sections[i].fraction}%</b>`;
+        fractionLabel.innerHTML = `<p> <b>${sections[i].fraction}%</b> </p>`;
     }
 }
 
@@ -445,21 +449,37 @@ function createTrunkStats() {
         for (let i = 0; i < 9; i++) {
             const trunkStat = document.createElement('div');
             trunkStat.classList.add('trunk-stat');
+
+            const colorLabelWrapper = document.createElement('div');
             const colorLabel = document.createElement('div');
             colorLabel.classList.add('color-label');
+            colorLabelWrapper.appendChild(colorLabel);
+
             const sizeLabel = document.createElement('div');
             sizeLabel.classList.add('size-label');
+
             const volumeLabel = document.createElement('div');
             volumeLabel.classList.add('volume-label');
+
             const fractionLabel = document.createElement('div');
             fractionLabel.classList.add('fraction-label');
             
-            trunkStat.appendChild(colorLabel);
+            trunkStat.appendChild(colorLabelWrapper);
             trunkStat.appendChild(sizeLabel);
             trunkStat.appendChild(volumeLabel);
             trunkStat.appendChild(fractionLabel);
 
+            if (i == 8) {
+                trunkStat.classList.add('big-font');
+            }
+
             parent.appendChild(trunkStat);
+
+            if (i == 7) {
+                const separator = document.createElement('div');
+                separator.classList.add('stats-separator');
+                parent.appendChild(separator);
+            }
         }   
     });
 }
@@ -476,4 +496,16 @@ function initTrunkInfo(dataArr) {
         updateTrunkStats(sections, blocks[i]);
         drawTrunk(canvases[i], sections);
     }
+}
+
+function calcGarbageAvg(newData, oldData) {
+    let newTotalCount = 0;
+    let oldTotalCount = 0;
+    for (let prop in newData) {
+        if (prop !== 'weight' && prop !== 'volume' && prop !== 'avg') {
+            newTotalCount += newData[prop];
+            oldTotalCount += oldData[prop];
+        }
+    }
+    return newTotalCount - oldTotalCount;
 }

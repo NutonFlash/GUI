@@ -76,9 +76,13 @@ window.onload = async () => {
             "bag_etc": 0,
             "others": 0,
             "weight": 0,
-            "volume": 0
+            "volume": 0,
+            "avg": 0
+            
     };
     
+    // localStorage.removeItem('garbageStats');
+
     let data = localStorage.getItem('garbageStats');
     if (!data) {
         data = initData;
@@ -95,6 +99,7 @@ window.onload = async () => {
         //     localStorage.setItem('garbageStats', data[0]);
         // }
         if (data) {
+            const oldData = { ...data };
             data.bag_5L++;
             data.bag_10L++;
             data.bag_20L++;
@@ -104,7 +109,8 @@ window.onload = async () => {
             data.bag_etc++;
             data.others++;
             data.weight += 5;
-            
+            data.avg = calcGarbageAvg(data, oldData);
+
             localStorage.setItem('garbageStats', JSON.stringify(data));
             updateGarbageStats(data);
         }
@@ -354,6 +360,9 @@ function updateGarbageStats(data) {
     let totalCount = data.bag_5L + data.bag_10L + data.bag_20L + data.bag_30L + data.bag_50L + data.bag_75L + data.bag_etc + data.others;
     totalCountNode.innerText = totalCount;
 
+    const garbageAvgNode = document.getElementById('garbage-avg');
+    garbageAvgNode.innerText = data.avg;
+
     const totalWeightNode = document.getElementById('garbage-totalweight');
     totalWeightNode.innerText = data.weight;
 
@@ -380,4 +389,16 @@ function updateGarbageStats(data) {
 
     const errCountNode = document.getElementById('garbage-error');
     errCountNode.innerText = data.others;
+}
+
+function calcGarbageAvg(newData, oldData) {
+    let newTotalCount = 0;
+    let oldTotalCount = 0;
+    for (let prop in newData) {
+        if (prop !== 'weight' && prop !== 'volume' && prop !== 'avg') {
+            newTotalCount += newData[prop];
+            oldTotalCount += oldData[prop];
+        }
+    }
+    return newTotalCount - oldTotalCount;
 }
