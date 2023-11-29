@@ -67,7 +67,6 @@ window.onload = async () => {
 
         drawDirectionPaths('맘스터치 우송대점');
     }, 5000);
-<<<<<<< HEAD
     
     const initData = {
             "bag_5L": 0,
@@ -85,23 +84,6 @@ window.onload = async () => {
     };
     
     // localStorage.removeItem('garbageStats');
-=======
-
-    const data = {
-        bag_5L: 1,
-        bag_10L: 2,
-        bag_20L: 3,
-        bag_30L: 4,
-        bag_50L: 5,
-        bag_75L: 6,
-        bag_etc: 7,
-        others: 8,
-        weight: 20,
-        volume: 9,
-    };
-
-    localStorage.setItem('garbageStats', data);
->>>>>>> main
 
     let data = localStorage.getItem('garbageStats');
     if (!data) {
