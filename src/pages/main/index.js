@@ -66,21 +66,29 @@ window.onload = async () => {
         drawDirectionPaths('맘스터치 우송대점');
     }, 5000);
     
-    const data = {
-            "bag_5L": 1,
-            "bag_10L": 2,
-            "bag_20L": 3,
-            "bag_30L": 4,
-            "bag_50L": 5,
-            "bag_75L": 6,
-            "bag_etc": 7,
-            "others": 8,
-            "weight": 20,
-            "volume": 9
+    const initData = {
+            "bag_5L": 0,
+            "bag_10L": 0,
+            "bag_20L": 0,
+            "bag_30L": 0,
+            "bag_50L": 0,
+            "bag_75L": 0,
+            "bag_etc": 0,
+            "others": 0,
+            "weight": 0,
+            "volume": 0
     };
     
-    localStorage.setItem('garbageStats', data);
+    let data = localStorage.getItem('garbageStats');
+    if (!data) {
+        data = initData;
+        localStorage.setItem('garbageStats', JSON.stringify(data));
+    } else {
+        data = JSON.parse(data);
+    }
 
+    updateGarbageStats(data);
+    
     setInterval(async () => {
         // const data = await fetchGarbageData();
         // if (data.length > 0) {
@@ -90,13 +98,14 @@ window.onload = async () => {
             data.bag_5L++;
             data.bag_10L++;
             data.bag_20L++;
-            data.bag_30L++;
+            data.bag_30L;
             data.bag_50L++;
-            data.bag_75L++;
+            data.bag_75L;
             data.bag_etc++;
             data.others++;
             data.weight += 5;
-        
+            
+            localStorage.setItem('garbageStats', JSON.stringify(data));
             updateGarbageStats(data);
         }
     }, 5000);
