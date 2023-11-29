@@ -6,10 +6,12 @@ let lockView = true;
 
 let oldDirectionPaths = [];
 
-
 window.onload = async () => {
     hideAlert();
     dtg = new DTG();
+
+    //binds to the first available dtg
+    dtg.bind('any', displayDTGData);
 
     document.getElementById('backBtn').onclick = () => {
         let t = document.createElement('a');
@@ -65,6 +67,7 @@ window.onload = async () => {
 
         drawDirectionPaths('맘스터치 우송대점');
     }, 5000);
+<<<<<<< HEAD
     
     const initData = {
             "bag_5L": 0,
@@ -82,6 +85,23 @@ window.onload = async () => {
     };
     
     // localStorage.removeItem('garbageStats');
+=======
+
+    const data = {
+        bag_5L: 1,
+        bag_10L: 2,
+        bag_20L: 3,
+        bag_30L: 4,
+        bag_50L: 5,
+        bag_75L: 6,
+        bag_etc: 7,
+        others: 8,
+        weight: 20,
+        volume: 9,
+    };
+
+    localStorage.setItem('garbageStats', data);
+>>>>>>> main
 
     let data = localStorage.getItem('garbageStats');
     if (!data) {
@@ -109,9 +129,13 @@ window.onload = async () => {
             data.bag_etc++;
             data.others++;
             data.weight += 5;
+<<<<<<< HEAD
             data.avg = calcGarbageAvg(data, oldData);
 
             localStorage.setItem('garbageStats', JSON.stringify(data));
+=======
+
+>>>>>>> main
             updateGarbageStats(data);
         }
     }, 5000);
@@ -337,7 +361,7 @@ async function fetchGarbageData() {
     await new Promise((res, rej) => {
         const request = new XMLHttpRequest();
         const serverUrl = 'http://localhost:5000';
-        request.open('GET', serverUrl + '/collection')
+        request.open('GET', serverUrl + '/collection');
         request.onreadystatechange = () => {
             if (request.readyState === XMLHttpRequest.DONE) {
                 const status = request.status;
@@ -349,7 +373,10 @@ async function fetchGarbageData() {
                 }
             }
         };
-        request.setRequestHeader('Authorization', 'Bearer ' + JSON.parse(localStorage.getItem('user')).token)
+        request.setRequestHeader(
+            'Authorization',
+            'Bearer ' + JSON.parse(localStorage.getItem('user')).token,
+        );
         request.send();
     });
     return data;
@@ -357,7 +384,15 @@ async function fetchGarbageData() {
 
 function updateGarbageStats(data) {
     const totalCountNode = document.getElementById('garbage-totalcount');
-    let totalCount = data.bag_5L + data.bag_10L + data.bag_20L + data.bag_30L + data.bag_50L + data.bag_75L + data.bag_etc + data.others;
+    let totalCount =
+        data.bag_5L +
+        data.bag_10L +
+        data.bag_20L +
+        data.bag_30L +
+        data.bag_50L +
+        data.bag_75L +
+        data.bag_etc +
+        data.others;
     totalCountNode.innerText = totalCount;
 
     const garbageAvgNode = document.getElementById('garbage-avg');
@@ -390,6 +425,7 @@ function updateGarbageStats(data) {
     const errCountNode = document.getElementById('garbage-error');
     errCountNode.innerText = data.others;
 }
+<<<<<<< HEAD
 
 function calcGarbageAvg(newData, oldData) {
     let newTotalCount = 0;
@@ -402,3 +438,5 @@ function calcGarbageAvg(newData, oldData) {
     }
     return newTotalCount - oldTotalCount;
 }
+=======
+>>>>>>> main
