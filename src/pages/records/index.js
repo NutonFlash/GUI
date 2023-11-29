@@ -49,6 +49,9 @@ window.onload = async () => {
     hideAlert();
     dtg = new DTG();
 
+    //binds to the first available dtg
+    dtg.bind('any', displayDTGData);
+    
     document.getElementById('bind-dtg').onclick = () => {
         let id = document.getElementById('dtg-id').value;
         dtg.bind(id, displayDTGData);

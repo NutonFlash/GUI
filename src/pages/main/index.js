@@ -111,13 +111,9 @@ window.onload = async () => {
             data.bag_etc++;
             data.others++;
             data.weight += 5;
-<<<<<<< HEAD
             data.avg = calcGarbageAvg(data, oldData);
 
             localStorage.setItem('garbageStats', JSON.stringify(data));
-=======
-
->>>>>>> main
             updateGarbageStats(data);
         }
     }, 5000);
@@ -407,7 +403,6 @@ function updateGarbageStats(data) {
     const errCountNode = document.getElementById('garbage-error');
     errCountNode.innerText = data.others;
 }
-<<<<<<< HEAD
 
 function calcGarbageAvg(newData, oldData) {
     let newTotalCount = 0;
@@ -420,5 +415,3 @@ function calcGarbageAvg(newData, oldData) {
     }
     return newTotalCount - oldTotalCount;
 }
-=======
->>>>>>> main
