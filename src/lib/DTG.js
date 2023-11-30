@@ -3,6 +3,7 @@ class DTG {
         this.data = {};
         this.connected = false;
         this.socket = null;
+        this.NORMAL_SPEED = 45;
     }
 
     setEngine(on) {
@@ -47,7 +48,7 @@ class DTG {
                 event: 'dtg',
                 payload: {
                     action: 'turn',
-                    deg: parseFloat(deg),
+                    deg: parseInt(deg) + '',
                 },
             }),
         );
