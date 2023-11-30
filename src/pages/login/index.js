@@ -64,7 +64,6 @@ async function authorizeDriver() {
                 if (status === 0 || (status >= 200 && status < 400)) {
                     isAthorized = true;
                     const response = JSON.parse(request.responseText);
-                    console.log(response);
                     response.authorized = true;
                     user = response;
                     localStorage.setItem('user', JSON.stringify(response));

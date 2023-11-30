@@ -554,16 +554,27 @@
     width: 25%;
     height: 95%;
     margin: 0 30px;
-    padding: 5px 0;
+    padding: 10px 5px;
     border: 1px solid grey;
     border-radius: 15px;
 }
 
 .trunk-stat {
     display: flex;
-    justify-content: space-evenly;
     align-items: center;
     margin: 1px 0;
+    height: calc(100% / 10);
+    text-align: center;
+    vertical-align: middle;
+}
+
+.trunk-stat p {
+    font-size: .7rem;
+    margin: 0;
+}
+
+.trunk-stat.big-font p {
+    font-size: .75rem;
 }
 
 .trunk-stat > div {
@@ -571,7 +582,32 @@
     font-size: .65rem;
 }
 
+.trunk-stat > div:first-child {
+    width: 15%;
+}
+
+.size-label {
+    width: 30%;
+}
+
+.volume-label {
+    width: 35%;
+}
+
+.fraction-label {
+    width: 20%;
+}
+
 .color-label {
-    width: 10px;
+    width: 50%;
     height: 5px;
+    margin: 0 auto;
+}
+
+.stats-separator {
+    background-color: #C1BEBE;
+    height: 2px;
+    width: 85%;
+    margin: 5px auto;
+    border-radius: 5px;
 }
