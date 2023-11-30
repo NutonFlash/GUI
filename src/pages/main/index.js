@@ -4,7 +4,12 @@ let userMarker = null;
 
 let lockView = true;
 
+let oldPaths = [];
 let oldDirectionPaths = [];
+
+let autopilot = true;
+let destReached = false;
+const DD_PATHS_THRESHOLD = 0.00008;
 
 window.onload = async () => {
     hideAlert();
@@ -58,31 +63,31 @@ window.onload = async () => {
 
     setInterval(() => {
         if (
-            prevLL &&
-            Math.abs(prevLL.lat - LL.lat) < 0.0002 &&
-            Math.abs(prevLL.lng - LL.lng) < 0.0002
+            destReached ||
+            (prevLL &&
+                Math.abs(prevLL.lat - LL.lat) < DD_PATHS_THRESHOLD &&
+                Math.abs(prevLL.lng - LL.lng) < DD_PATHS_THRESHOLD)
         )
             return;
         prevLL = { ...LL };
 
         drawDirectionPaths('맘스터치 우송대점');
     }, 5000);
-    
+
     const initData = {
-            "bag_5L": 0,
-            "bag_10L": 0,
-            "bag_20L": 0,
-            "bag_30L": 0,
-            "bag_50L": 0,
-            "bag_75L": 0,
-            "bag_etc": 0,
-            "others": 0,
-            "weight": 0,
-            "volume": 0,
-            "avg": 0
-            
+        bag_5L: 0,
+        bag_10L: 0,
+        bag_20L: 0,
+        bag_30L: 0,
+        bag_50L: 0,
+        bag_75L: 0,
+        bag_etc: 0,
+        others: 0,
+        weight: 0,
+        volume: 0,
+        avg: 0,
     };
-    
+
     // localStorage.removeItem('garbageStats');
 
     let data = localStorage.getItem('garbageStats');
@@ -94,14 +99,15 @@ window.onload = async () => {
     }
 
     updateGarbageStats(data);
-    
+
     setInterval(async () => {
         // const data = await fetchGarbageData();
         // if (data.length > 0) {
         //     localStorage.setItem('garbageStats', data[0]);
         // }
-        if (data) {
+        if (data && convSpeed(dtg.data.speed, dtg.data.factor_speed) <= 0) {
             const oldData = { ...data };
+
             data.bag_5L++;
             data.bag_10L++;
             data.bag_20L++;
@@ -123,6 +129,8 @@ async function drawDirectionPaths(to, from = LL) {
     for (let op of oldDirectionPaths) op.setMap(null);
 
     oldDirectionPaths = [];
+    oldPaths = [];
+    oldPathPt = 0;
 
     let waypoints = await getDirectionFromLatLng(
         await getLatLngFromKeyword(to),
@@ -150,7 +158,11 @@ async function drawDirectionPaths(to, from = LL) {
                 _LL.lat = vert;
                 count = 0;
 
-                paths.push(new kakao.maps.LatLng(_LL.lat, _LL.lng));
+                let kkll = new kakao.maps.LatLng(_LL.lat, _LL.lng);
+                paths.push(kkll);
+
+                if (oldPaths.length <= 5)
+                    oldPaths.push({ lat: kkll.Ma, lng: kkll.La });
             }
         }
     }
@@ -202,6 +214,11 @@ async function getLatLngFromKeyword(keyword) {
 function degToRad(deg) {
     return (deg * Math.PI) / 180;
 }
+
+function radToDeg(rad) {
+    return (rad * 180) / Math.PI;
+}
+
 function rotate(x, y, theta) {
     return {
         x: x * Math.cos(degToRad(theta)) - y * Math.sin(degToRad(theta)),
@@ -290,7 +307,77 @@ function displayDTGData(data) {
     _kakaoLL = kakaoLL;
 
     if (lockView) map.setCenter(kakaoLL);
+
+    //calculate direction
+
+    if (autopilot) {
+        let dTot = 0;
+        for (let i = oldPathPt; i < oldPaths.length; i++) {
+            let op = oldPaths[i];
+            if (_temp) _temp.setMap(null);
+            let dLng = op.lng - LL.lng;
+            let dLat = op.lat - LL.lat;
+            dTot = Math.abs(dLng) + Math.abs(dLat);
+            if (dTot > DD_PATHS_THRESHOLD / 3) {
+                _temp = new kakao.maps.Circle({
+                    center: new kakao.maps.LatLng(op.lat, op.lng), // 원의 중심좌표 입니다
+                    radius: 5, // 미터 단위의 원의 반지름입니다
+                    strokeWeight: 5, // 선의 두께입니다
+                    strokeColor: '#ff0000', // 선의 색깔입니다
+                    strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+                    strokeStyle: 'solid', // 선의 스타일 입니다
+                    fillColor: '#ff0000', // 채우기 색깔입니다
+                    fillOpacity: 1, // 채우기 불투명도 입니다
+                    map: map,
+                });
+                let deg = radToDeg(Math.atan(Math.abs(dLat) / Math.abs(dLng)));
+
+                if (dLng >= 0) {
+                    if (dLat >= 0) {
+                        deg = 90 - deg;
+                    } else {
+                        deg += 90;
+                    }
+                } else {
+                    if (dLat >= 0) {
+                        deg += 270;
+                    } else {
+                        deg = 270 - deg;
+                    }
+                }
+
+                let turnDeg = deg - orientation;
+                if (
+                    revCount <= 5 &&
+                    Math.abs(turnDeg) <= 190 &&
+                    Math.abs(turnDeg) >= 170
+                ) {
+                    revCount++;
+                    continue;
+                } else {
+                    revCount = 0;
+                }
+                dtg.turn(turnDeg);
+                break;
+            } else {
+                oldPathPt++;
+                continue;
+            }
+        }
+        if (oldPaths.length < 3 && dTot < DD_PATHS_THRESHOLD * 5) {
+            if (oldPathPt !== 0) {
+                destReached = true;
+                autopilot = false;
+            }
+            dtg.setBrake('low');
+        } else if (speed > dtg.NORMAL_SPEED) dtg.setAccel('none');
+        else dtg.setAccel('low');
+    }
 }
+
+let _temp;
+let oldPathPt = 0;
+let revCount = 0;
 
 function convLatLng(latlng) {
     return {

@@ -201,10 +201,12 @@ func (_dtg *DTG) Accelerate(accel Accel) {
 
 	prevAcc := _dtg.Acceleration
 
+	wasBraking := _dtg.isBraking
+
 	_dtg.isBraking = false
 	_dtg.Acceleration = toAcceleration(accel)
 
-	if prevAcc != toAcceleration(accel-1) && prevAcc != toAcceleration(accel+1) {
+	if !wasBraking && prevAcc != toAcceleration(accel) && prevAcc != toAcceleration(accel-1) && prevAcc != toAcceleration(accel+1) {
 		_dtg.SuddenAccel++
 	}
 }
@@ -222,7 +224,7 @@ func (_dtg *DTG) Brake(accel Accel) {
 		}
 	} else {
 		//if prevAcc > _dtg.Acceleration && prevAcc != toBrakeAcceleration(accel-1) {
-		if prevAcc != toBrakeAcceleration(accel+1) && prevAcc != toBrakeAcceleration(accel-1) {
+		if prevAcc != toBrakeAcceleration(accel) && prevAcc != toBrakeAcceleration(accel+1) && prevAcc != toBrakeAcceleration(accel-1) {
 			_dtg.SuddenBrake++
 		}
 	}
